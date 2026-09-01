@@ -1,0 +1,197 @@
+import React from 'react';
+import { useSimulation } from '../context/SimulationContext';
+import { 
+  ResponsiveContainer, 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  Tooltip, 
+  CartesianGrid, 
+  ReferenceLine 
+} from 'recharts';
+import { Radio, AlertTriangle, Play, Pause, RotateCcw, TrendingUp, Sparkles, Zap } from 'lucide-react';
+
+export const NowcastingTimeline = () => {
+  const { 
+    currentTimeline, 
+    scenario, 
+    timeStepIndex, 
+    setTimeStepIndex, 
+    isAutoPlaying, 
+    toggleAutoPlay,
+    currentLocation 
+  } = useSimulation();
+
+  const selectedPoint = currentTimeline[timeStepIndex] || currentTimeline[0];
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white border border-stone-300 p-3 rounded-lg shadow-md text-xs space-y-1 font-mono">
+          <div className="font-bold text-stone-900 border-b border-stone-200 pb-1">{label} Horizon</div>
+          <div className="text-emerald-700">🌧️ Rainfall: {payload[0]?.value} mm/h</div>
+          <div className="text-sky-700">💨 Wind: {payload[1]?.value} km/h</div>
+          <div className="text-rose-700 font-bold">⚠️ Risk Score: {payload[2]?.value} / 100</div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-6">
+      
+      {/* Title */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-200 pb-4">
+        <div>
+          <div className="flex items-center space-x-2">
+            <Radio className="w-5 h-5 text-amber-700 animate-pulse" />
+            <h2 className="text-lg font-extrabold text-stone-900">
+              AI Nowcasting Simulation (90-Minute Forecast)
+            </h2>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-300">
+              Spatial-Temporal ConvLSTM
+            </span>
+          </div>
+          <p className="text-xs text-stone-500 font-mono mt-1">
+            Simulated 15-minute interval predictive trend vectors for {currentLocation.shortName}
+          </p>
+        </div>
+
+        {/* Dynamic Risk Escalation Banner */}
+        <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg border font-mono text-xs shadow-2xs ${
+          scenario === 'SEVERE_WEATHER' 
+            ? 'bg-purple-50 border-purple-300 text-purple-900 font-bold'
+            : scenario === 'HEAVY_RAIN'
+            ? 'bg-rose-50 border-rose-300 text-rose-900 font-bold'
+            : scenario === 'MODERATE_RAIN'
+            ? 'bg-amber-50 border-amber-300 text-amber-900'
+            : 'bg-emerald-50 border-emerald-300 text-emerald-900'
+        }`}>
+          <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+          <span>
+            {scenario === 'NORMAL' 
+              ? 'Stable atmospheric trend' 
+              : '⚡ Risk Escalation Detected in ' + currentLocation.shortName}
+          </span>
+        </div>
+      </div>
+
+      {/* Timeline Stepper Buttons */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-stone-50 border border-stone-200 p-3 rounded-xl">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={toggleAutoPlay}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer ${
+              isAutoPlaying 
+                ? 'bg-amber-600 text-white' 
+                : 'bg-stone-900 hover:bg-stone-800 text-amber-100'
+            }`}
+          >
+            {isAutoPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 text-amber-400" />}
+            <span>{isAutoPlaying ? 'Pause Demo' : 'Auto Play 90m Demo'}</span>
+          </button>
+          <span className="text-[11px] text-stone-500 font-mono hidden md:inline">
+            Step through time horizons:
+          </span>
+        </div>
+
+        {/* 6 Time Step Pills */}
+        <div className="flex items-center space-x-1 overflow-x-auto max-w-full">
+          {currentTimeline.map((item, idx) => {
+            const isSelected = idx === timeStepIndex;
+            return (
+              <button
+                key={item.time}
+                onClick={() => setTimeStepIndex(idx)}
+                className={`px-3 py-1 rounded-md text-xs font-mono font-bold transition cursor-pointer ${
+                  isSelected
+                    ? 'bg-amber-800 text-white shadow-2xs font-black'
+                    : 'bg-white text-stone-700 hover:text-stone-900 border border-stone-200'
+                }`}
+              >
+                {item.time}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Selected Time Horizon Summary */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-stone-50/80 p-4 rounded-xl border border-stone-200 font-mono text-xs">
+        <div>
+          <span className="text-stone-500 block text-[10px] font-semibold">TIME HORIZON</span>
+          <span className="text-stone-900 font-bold text-sm">{selectedPoint.time}</span>
+        </div>
+        <div>
+          <span className="text-stone-500 block text-[10px] font-semibold">RAINFALL PREDICTION</span>
+          <span className="text-emerald-800 font-bold text-sm">{selectedPoint.rainfall} mm/h</span>
+        </div>
+        <div>
+          <span className="text-stone-500 block text-[10px] font-semibold">WIND SPEED PREDICTION</span>
+          <span className="text-sky-800 font-bold text-sm">{selectedPoint.wind} km/h</span>
+        </div>
+        <div>
+          <span className="text-stone-500 block text-[10px] font-semibold">PREDICTED RISK SCORE</span>
+          <span className={`font-bold text-sm ${selectedPoint.riskScore > 70 ? 'text-rose-700' : selectedPoint.riskScore > 40 ? 'text-amber-800' : 'text-emerald-800'}`}>
+            {selectedPoint.riskScore} / 100
+          </span>
+        </div>
+      </div>
+
+      {/* Recharts Graphical Visualization Area */}
+      <div className="h-72 w-full pt-2">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={currentTimeline} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <defs>
+              <linearGradient id="colorRainfallLight" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#059669" stopOpacity={0.25}/>
+                <stop offset="95%" stopColor="#059669" stopOpacity={0}/>
+              </linearGradient>
+              <linearGradient id="colorWindLight" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#0284c7" stopOpacity={0.2}/>
+                <stop offset="95%" stopColor="#0284c7" stopOpacity={0}/>
+              </linearGradient>
+              <linearGradient id="colorRiskLight" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#dc2626" stopOpacity={0.4}/>
+                <stop offset="95%" stopColor="#dc2626" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+
+            <CartesianGrid strokeDasharray="3 3" stroke="#e7e0d3" />
+            <XAxis dataKey="time" stroke="#78716c" tick={{ fontSize: 11, fill: '#44403c' }} />
+            <YAxis stroke="#78716c" tick={{ fontSize: 11, fill: '#44403c' }} domain={[0, 120]} />
+            <Tooltip content={<CustomTooltip />} />
+
+            <ReferenceLine y={50} stroke="#d97706" strokeDasharray="3 3" label={{ value: 'Moderate Risk Threshold (50)', fill: '#b45309', fontSize: 10 }} />
+            <ReferenceLine y={75} stroke="#dc2626" strokeDasharray="3 3" label={{ value: 'Severe Warning Threshold (75)', fill: '#b91c1c', fontSize: 10 }} />
+
+            <Area type="monotone" dataKey="rainfall" name="Rainfall (mm/h)" stroke="#059669" strokeWidth={2} fillOpacity={1} fill="url(#colorRainfallLight)" />
+            <Area type="monotone" dataKey="wind" name="Wind (km/h)" stroke="#0284c7" strokeWidth={2} fillOpacity={1} fill="url(#colorWindLight)" />
+            <Area type="monotone" dataKey="riskScore" name="Risk Score (0-100)" stroke="#dc2626" strokeWidth={3} fillOpacity={1} fill="url(#colorRiskLight)" />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Predictive Risk Trajectory */}
+      <div className="bg-stone-50 p-3 rounded-xl border border-stone-200 text-xs font-mono flex flex-wrap items-center justify-between gap-2">
+        <span className="text-stone-700 font-bold flex items-center gap-1">
+          <TrendingUp className="w-3.5 h-3.5 text-amber-700" />
+          Predictive Risk Trajectory:
+        </span>
+        <div className="flex items-center space-x-2 font-bold text-stone-900">
+          {currentTimeline.map((pt, i) => (
+            <React.Fragment key={pt.time}>
+              <span className={`px-2 py-0.5 rounded ${i === timeStepIndex ? 'bg-amber-800 text-white font-black' : 'bg-white text-stone-700 border border-stone-200'}`}>
+                {pt.riskScore}
+              </span>
+              {i < currentTimeline.length - 1 && <span className="text-stone-400">→</span>}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
+    </div>
+  );
+};

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIH26077 - Pure Software Architecture Diagram (AGNI-CAST)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #faf7f2;
+      color: #1c1917;
+    }
+  </style>
+</head>
+<body class="p-4 sm:p-8 min-h-screen bg-[#faf7f2]">
+
+  <!-- Header Bar -->
+  <div class="max-w-5xl mx-auto mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 print:hidden border-b border-stone-300 pb-4">
+    <div>
+      <div class="flex items-center space-x-2">
+        <span class="bg-amber-800 text-white font-mono font-bold text-xs px-2.5 py-1 rounded">SIH26077</span>
+        <h1 class="text-xl font-extrabold text-stone-900 tracking-tight">100% Software Architecture Diagram</h1>
+      </div>
+      <p class="text-xs text-stone-600 font-mono mt-1">
+        Weather APIs ──► Ingestion & AI Core ──► RAG Database ──► Admin Web Portal ──► User Android App
+      </p>
+    </div>
+
+    <button onclick="window.print()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-amber-100 font-bold text-xs rounded-lg shadow-xs transition flex items-center space-x-2 cursor-pointer">
+      <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+      <span>Print / Export PDF</span>
+    </button>
+  </div>
+
+  <!-- Main Canvas Container -->
+  <div class="max-w-5xl mx-auto p-6 md:p-8 relative min-h-[920px] bg-white border-2 border-stone-300 rounded-2xl shadow-sm">
+    
+    <!-- Title inside canvas -->
+    <div class="text-center border-b border-stone-200 pb-4 mb-6">
+      <h2 class="text-lg font-black text-stone-900 uppercase font-mono tracking-tight">
+        SIH26077: AGNI-CAST SOFTWARE SYSTEM ARCHITECTURE
+      </h2>
+      <p class="text-xs font-semibold text-stone-600">
+        Pure Software Architecture • Admin Web Portal & Android App for Citizens
+      </p>
+    </div>
+
+    <!-- SVG Connector Lines Overlay (Clean Coordinates) -->
+    <svg class="absolute inset-0 w-full h-full pointer-events-none z-10" style="min-height: 920px;">
+      <defs>
+        <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <polygon points="0 0, 8 4, 0 8" fill="#444444" />
+        </marker>
+      </defs>
+
+      <!-- Arrow 1: Green Box 1 (Weather API) to Orange Box (Data Preprocessor) -->
+      <path d="M 520 160 C 440 160, 420 185, 365 185" fill="none" stroke="#444444" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+      <!-- Arrow 2: Green Box 2 (Doppler Radar) to Orange Box (Data Preprocessor) -->
+      <path d="M 740 160 C 600 160, 440 185, 365 195" fill="none" stroke="#444444" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+      <!-- Arrow 3: Controller Orange Box to Cloud Infrastructure DB -->
+      <path d="M 270 220 C 270 250, 270 280, 270 320" fill="none" stroke="#444444" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+      <!-- Arrow 4: Controller Orange Box to Red Box 1 (Admin Dashboard Alert) -->
+      <path d="M 365 210 C 420 250, 520 330, 560 340" fill="none" stroke="#444444" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+      <!-- Arrow 5: Controller Orange Box to Red Box 2 (Android Push Notification) -->
+      <path d="M 365 215 C 480 260, 680 330, 770 340" fill="none" stroke="#444444" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+      <!-- Arrow 6: Cloud DB to Purple Box 1 (React Dashboard) -->
+      <path d="M 220 390 C 180 430, 160 470, 160 510" fill="none" stroke="#444444" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+      <!-- Arrow 7: Cloud DB to Purple Box 2 (Admin Control & RAG) -->
+      <path d="M 320 390 C 360 430, 390 470, 390 510" fill="none" stroke="#444444" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+      <!-- Arrow 8: Purple Box 1 to Bottom User Circle (Android App Citizens) -->
+      <path d="M 170 580 C 170 630, 170 670, 170 710" fill="none" stroke="#444444" stroke-width="1.5" marker-end="url(#arrowhead)" />
+    </svg>
+
+    <!-- HTML Box Elements -->
+
+    <!-- TOP RIGHT CONTAINER: External Weather APIs & Alert Outlets -->
+    <div class="absolute top-[100px] right-[30px] w-[500px] h-[310px] border border-stone-500 bg-white p-4">
+      <div class="text-center font-bold text-xs text-stone-800 mb-3 border-b border-stone-200 pb-1">
+        External Weather Data APIs & Alert Dispatch Outlets
+      </div>
+
+      <!-- Top Row 2 Green Boxes (APIs) -->
+      <div class="flex justify-between space-x-3 mb-2">
+        <div class="w-[220px] h-[65px] border border-emerald-700 bg-emerald-100/70 p-2 text-center text-xs text-stone-900 flex flex-col justify-center">
+          <div class="font-bold text-emerald-950">Open-Meteo & Weather APIs</div>
+          <div class="text-[10px] text-stone-700">Fetches Live Temp, Humidity & Rain</div>
+        </div>
+
+        <div class="w-[220px] h-[65px] border border-emerald-700 bg-emerald-100/70 p-2 text-center text-xs text-stone-900 flex flex-col justify-center">
+          <div class="font-bold text-emerald-950">Doppler Radar & Satellite API</div>
+          <div class="text-[10px] text-stone-700">Streams Cloud Motion & Rain Grid</div>
+        </div>
+      </div>
+
+      <!-- Text Labels Below Green Boxes -->
+      <div class="flex justify-between text-[10px] font-mono text-stone-700 px-6 mb-6">
+        <span>Reads Weather API Stream</span>
+        <span>Detects Cloudburst Intensity</span>
+      </div>
+
+      <!-- Text Labels Above Red Boxes -->
+      <div class="flex justify-between text-[10px] font-mono text-stone-700 px-6 mb-2">
+        <span>Evaluates Risk Thresholds</span>
+        <span>Dispatches Push Advisory</span>
+      </div>
+
+      <!-- Bottom Row 2 Red/Rose Boxes (Software Outlets) -->
+      <div class="flex justify-between space-x-3">
+        <div class="w-[210px] h-[55px] border border-rose-600 bg-rose-100/80 p-2 text-center text-xs text-stone-900 flex flex-col justify-center">
+          <div class="font-bold text-rose-950">Admin Web Dashboard Alerts</div>
+          <div class="text-[10px] text-rose-800">Displays Emergency Banners</div>
+        </div>
+
+        <div class="w-[210px] h-[55px] border border-rose-600 bg-rose-100/80 p-2 text-center text-xs text-stone-900 flex flex-col justify-center">
+          <div class="font-bold text-rose-950">Android App Push Notifications</div>
+          <div class="text-[10px] text-rose-800">Cell Broadcast System (CAP v1.2)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP LEFT / MIDDLE CONTAINER: Data Ingestion Pipeline -->
+    <div class="absolute top-[135px] left-[170px] w-[200px] h-[85px] border border-stone-500 bg-white p-2">
+      <div class="text-center font-bold text-xs text-stone-800 mb-1">
+        Backend Ingestion Pipeline
+      </div>
+      <div class="w-full h-[45px] border border-amber-600 bg-amber-100/80 text-stone-900 font-bold text-xs flex flex-col items-center justify-center text-center p-1">
+        <span>API Fetcher & Preprocessor</span>
+        <span class="text-[9px] font-normal text-stone-700">Parses JSON & Coordinates</span>
+      </div>
+    </div>
+
+    <!-- Arrow Text Label below Controller -->
+    <div class="absolute top-[235px] left-[180px] text-[10px] font-mono text-stone-700 text-center font-semibold">
+      Uploads JSON Telemetry Stream <br /> via HTTP / REST
+    </div>
+
+    <!-- MIDDLE LEFT CONTAINER: Cloud Infrastructure & RAG DB -->
+    <div class="absolute top-[310px] left-[110px] w-[320px] h-[100px] border border-stone-500 bg-white p-2">
+      <div class="text-center font-bold text-xs text-stone-800 mb-2">
+        Cloud Infrastructure & Database
+      </div>
+      
+      <!-- Blue Oval DB -->
+      <div class="w-[170px] h-[50px] mx-auto border border-blue-600 bg-blue-100/90 rounded-[50%] flex flex-col items-center justify-center text-xs text-blue-950 font-bold text-center">
+        <span>PostgreSQL & Vector DB</span>
+        <span class="text-[9px] font-normal text-blue-800">Telemetry Logs & RAG Index</span>
+      </div>
+    </div>
+
+    <!-- Arrow Text Labels below Database -->
+    <div class="absolute top-[430px] left-[95px] text-[10px] font-mono text-stone-700 font-semibold">
+      Fetches Real-Time Data
+    </div>
+    <div class="absolute top-[430px] left-[300px] text-[10px] font-mono text-stone-700 font-semibold">
+      Fetches Historical & RAG SOPs
+    </div>
+
+    <!-- BOTTOM LEFT CONTAINER: User Interface (WEBSITE FOR ADMIN) -->
+    <div class="absolute top-[500px] left-[55px] w-[470px] h-[90px] border border-stone-500 bg-white p-2">
+      <div class="text-center font-bold text-xs text-stone-900 mb-2">
+        User Interface (WEBSITE FOR ADMIN)
+      </div>
+
+      <div class="flex justify-between space-x-3 px-1">
+        <div class="w-[210px] h-[45px] border border-purple-600 bg-purple-100/80 text-xs text-stone-900 flex flex-col items-center justify-center text-center">
+          <span class="font-bold">React Dashboard & Leaflet Map</span>
+          <span class="text-[9px] text-stone-700">Real-Time Risk Monitoring</span>
+        </div>
+
+        <div class="w-[210px] h-[45px] border border-purple-600 bg-purple-100/80 text-xs text-stone-900 flex flex-col items-center justify-center text-center">
+          <span class="font-bold">Admin Alert Review & RAG Search</span>
+          <span class="text-[9px] text-stone-700">Approve & Broadcast Bulletins</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow Text Label below User Interface -->
+    <div class="absolute top-[605px] left-[85px] text-[10px] font-mono text-stone-800 text-center font-bold">
+      Displays SAFE / MODERATE / HIGH / EXTREME Alerts & Sends Multilingual Mobile Push
+    </div>
+
+    <!-- BOTTOM CIRCLE: Citizens (ANDROID APP FOR USERS) & Disaster Officers -->
+    <div class="absolute top-[700px] left-[95px] w-[150px] h-[150px] border border-stone-500 bg-stone-100 rounded-full flex flex-col items-center justify-center text-center text-xs text-stone-900 font-bold p-3 shadow-xs">
+      <span>ANDROID APP FOR USERS</span>
+      <span class="text-[10px] font-normal text-stone-600 mt-1">Citizens & Disaster Officers (EN / MR / HI)</span>
+    </div>
+
+  </div>
+
+</body>
+</html>
