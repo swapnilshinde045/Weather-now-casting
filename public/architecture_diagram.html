@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SIH26077 - 4-Zone Architecture Diagram (AGNI-CAST)</title>
+  <title>SIH26077 - Complete 4-Zone Architecture & RAG Pipeline (AGNI-CAST)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
@@ -21,54 +21,97 @@
 </head>
 <body class="p-4 sm:p-8 min-h-screen">
 
-  <!-- Print & Export Header -->
-  <div class="max-w-7xl mx-auto mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 no-print border-b border-stone-300 pb-4">
+  <!-- Header Bar -->
+  <div class="max-w-[1300px] mx-auto mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 no-print border-b border-stone-300 pb-4">
     <div>
       <div class="flex items-center space-x-2">
         <span class="bg-amber-800 text-white font-mono font-bold text-xs px-2.5 py-1 rounded">SIH26077</span>
-        <h1 class="text-xl font-extrabold text-stone-900 tracking-tight">4-Zone System Architecture Diagram</h1>
+        <h1 class="text-xl font-extrabold text-stone-900 tracking-tight">System Architecture & RAG Pipeline Diagram</h1>
       </div>
       <p class="text-xs text-stone-600 font-mono mt-1">
-        Presentation Slide Diagram: Users & APIs ──► Frontend ──► Backend Services ──► AI Intelligence & DB
+        Complete Flow: Weather APIs ──► AI Prediction ──► RAG SOP Vector Search ──► Admin Approval Loop ──► Mobile Push
       </p>
     </div>
 
     <button onclick="window.print()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-amber-100 font-bold text-xs rounded-lg shadow-xs transition flex items-center space-x-2 cursor-pointer">
-      <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+      <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
       <span>Print / Export PPT PDF</span>
     </button>
   </div>
 
-  <!-- Main Architecture Canvas Container (4 Vertical Zones) -->
-  <div class="max-w-7xl mx-auto bg-white border-2 border-stone-300 rounded-2xl p-6 shadow-xl print-shadow-none">
+  <!-- Main Canvas Container with SVG Connectors -->
+  <div class="max-w-[1300px] mx-auto bg-white border-2 border-stone-300 rounded-2xl p-6 shadow-xl relative min-h-[920px] print-shadow-none">
     
-    <!-- Title Header inside Canvas -->
+    <!-- Title Header -->
     <div class="text-center border-b-2 border-stone-200 pb-4 mb-6">
       <h2 class="text-xl font-black text-stone-900 uppercase font-mono tracking-tight">
-        SIH26077: AGNI-CAST SYSTEM ARCHITECTURE DIAGRAM
+        SIH26077: AGNI-CAST END-TO-END SYSTEM ARCHITECTURE & RAG PIPELINE
       </h2>
       <p class="text-xs font-semibold text-stone-600">
-        AI-Driven Hyper-Local Early Warning System for Severe Weather Nowcasting
+        AI-Driven Hyper-Local Weather Nowcasting • Vector RAG Engine • Admin Approval Loop • Multilingual Mobile Alerts
       </p>
     </div>
 
+    <!-- SVG Flow Connectors Layer -->
+    <svg class="absolute inset-0 w-full h-full pointer-events-none z-20" style="min-height: 920px;">
+      <defs>
+        <marker id="arrow-blue" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <polygon points="0 0, 8 4, 0 8" fill="#0284c7" />
+        </marker>
+        <marker id="arrow-purple" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <polygon points="0 0, 8 4, 0 8" fill="#7e22ce" />
+        </marker>
+        <marker id="arrow-amber" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <polygon points="0 0, 8 4, 0 8" fill="#d97706" />
+        </marker>
+        <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <polygon points="0 0, 8 4, 0 8" fill="#15803d" />
+        </marker>
+        <marker id="arrow-teal" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <polygon points="0 0, 8 4, 0 8" fill="#0f766e" />
+        </marker>
+      </defs>
+
+      <!-- Connection 1: Weather APIs (Zone 1) -> Ingestion Service (Zone 3) -->
+      <path d="M 270 200 C 370 140, 560 140, 660 260" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-dasharray="6 3" marker-end="url(#arrow-blue)" />
+
+      <!-- Connection 2: Ingestion Service (Zone 3) -> AI Core (Zone 4) -->
+      <path d="M 900 270 C 930 270, 950 270, 970 270" fill="none" stroke="#7e22ce" stroke-width="2.5" marker-end="url(#arrow-purple)" />
+
+      <!-- Connection 3: RAG Bidirectional Loop (AI Model <-> Vector DB in Zone 4) -->
+      <path d="M 1120 460 C 1170 460, 1170 650, 1120 650" fill="none" stroke="#0f766e" stroke-width="2.5" marker-end="url(#arrow-teal)" />
+      <path d="M 1100 640 C 1050 640, 1050 470, 1100 470" fill="none" stroke="#0f766e" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arrow-teal)" />
+
+      <!-- Connection 4: AI Predictions -> Backend Routing to Zone 2 Admin Portal -->
+      <path d="M 970 330 C 850 330, 600 240, 560 250" fill="none" stroke="#d97706" stroke-width="2.5" marker-end="url(#arrow-amber)" />
+
+      <!-- Connection 5: Admin Human Approval Loop (Zone 2 Admin -> Zone 3 Notification Service) -->
+      <path d="M 560 360 C 600 370, 640 470, 660 480" fill="none" stroke="#d97706" stroke-width="2.5" marker-end="url(#arrow-amber)" />
+
+      <!-- Connection 6: Notification Service (Zone 3) -> Citizen App (Zone 2) -->
+      <path d="M 660 520 C 580 540, 480 540, 440 540" fill="none" stroke="#15803d" stroke-width="2.5" marker-end="url(#arrowhead)" />
+
+      <!-- Connection 7: Citizen App -> Citizen Actor (Zone 1) -->
+      <path d="M 310 560 C 250 580, 200 630, 180 660" fill="none" stroke="#15803d" stroke-width="2.5" marker-end="url(#arrow-green)" />
+    </svg>
+
     <!-- 4 Zone Columns Grid Layout -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-stretch relative">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-stretch relative z-10">
       
       <!-- ZONE 1: Users & External Services -->
       <div class="bg-stone-50/80 border-2 border-stone-300 rounded-xl p-4 flex flex-col justify-between space-y-6">
         
-        <!-- Zone Title Header -->
+        <!-- Header -->
         <div class="text-center border-b border-stone-300 pb-2">
           <div class="text-xs font-black uppercase text-stone-700 tracking-wider font-mono">Zone 1</div>
           <div class="text-sm font-bold text-stone-900">Users & External Services</div>
         </div>
 
-        <!-- Third Party Services Cloud -->
-        <div class="border-2 border-dashed border-sky-400 bg-sky-50/80 rounded-2xl p-4 space-y-2 text-center shadow-xs">
+        <!-- Weather APIs Cloud -->
+        <div class="border-2 border-dashed border-sky-400 bg-sky-50/90 rounded-2xl p-4 space-y-2 text-center shadow-xs">
           <div class="text-xs font-extrabold text-sky-950 flex items-center justify-center gap-1.5">
             <svg class="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 001-9.9M15 13a3 3 0 00-3-3h-1.5A3.5 3.5 0 007 13.5"></path></svg>
-            <span>Third-Party Services</span>
+            <span>Live Weather APIs (0 Hardware)</span>
           </div>
 
           <div class="space-y-1.5 pt-1">
@@ -79,33 +122,31 @@
               IMD Doppler Radar Grid API
             </div>
             <div class="bg-white border border-sky-300 rounded-lg p-2 text-[11px] font-bold text-sky-900 shadow-2xs">
-              GIS Topography & Elevation API
+              GIS Elevation & Topography API
             </div>
           </div>
         </div>
 
-        <!-- Users Actors Section -->
-        <div class="space-y-3 pt-2">
+        <!-- User Actors -->
+        <div class="space-y-3 pt-4">
           
-          <!-- Admin Actor -->
           <div class="bg-white border-2 border-amber-300 rounded-xl p-3 flex items-center space-x-3 shadow-xs">
             <div class="w-9 h-9 rounded-full bg-amber-100 border border-amber-400 flex items-center justify-center font-bold text-amber-900 text-sm">
               👨‍💼
             </div>
             <div>
               <div class="font-bold text-xs text-amber-950">Disaster Authority Admin</div>
-              <div class="text-[10px] text-stone-600">Interacts with Command Web Dashboard</div>
+              <div class="text-[10px] text-stone-600">Human-in-the-Loop Review</div>
             </div>
           </div>
 
-          <!-- Citizen Actor -->
           <div class="bg-white border-2 border-emerald-300 rounded-xl p-3 flex items-center space-x-3 shadow-xs">
             <div class="w-9 h-9 rounded-full bg-emerald-100 border border-emerald-400 flex items-center justify-center font-bold text-emerald-900 text-sm">
               🧑‍🌾
             </div>
             <div>
-              <div class="font-bold text-xs text-emerald-950">Citizens & First Responders</div>
-              <div class="text-[10px] text-stone-600">Receives Multilingual Push Bulletins</div>
+              <div class="font-bold text-xs text-emerald-950">Citizens & Responders</div>
+              <div class="text-[10px] text-stone-600">Multilingual Android App Alerts</div>
             </div>
           </div>
 
@@ -116,58 +157,57 @@
       <!-- ZONE 2: Frontend (Presentation Layer) -->
       <div class="bg-emerald-50/60 border-2 border-emerald-300 rounded-xl p-4 flex flex-col justify-between space-y-4">
         
-        <!-- Zone Title Header -->
+        <!-- Header -->
         <div class="text-center border-b border-emerald-300 pb-2">
           <div class="text-xs font-black uppercase text-emerald-800 tracking-wider font-mono">Zone 2</div>
           <div class="text-sm font-bold text-emerald-950">Frontend (Presentation Layer)</div>
         </div>
 
-        <!-- Main Outer App Box -->
         <div class="border-2 border-emerald-400 bg-white rounded-2xl p-4 space-y-4 shadow-sm flex-1 flex flex-col justify-between">
           <div class="text-center border-b border-emerald-200 pb-2">
-            <span class="text-xs font-black text-emerald-950 font-mono">AGNI-CAST UI Apps</span>
-            <div class="text-[10px] font-semibold text-emerald-800">(React 19 / Vite / Android App)</div>
+            <span class="text-xs font-black text-emerald-950 font-mono">AGNI-CAST Interfaces</span>
+            <div class="text-[10px] font-semibold text-emerald-800">(React 19 / Vite / Android)</div>
           </div>
 
-          <!-- Box 1: Admin Web Dashboard -->
-          <div class="bg-emerald-50/80 border border-emerald-300 rounded-xl p-3 space-y-2">
-            <div class="font-bold text-xs text-emerald-950 flex items-center justify-between">
-              <span>Fayda Admin Web Portal</span>
-              <span class="text-[9px] bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded font-mono">Web</span>
+          <!-- Admin Web Portal Box -->
+          <div class="bg-amber-50/90 border-2 border-amber-300 rounded-xl p-3 space-y-2 shadow-xs">
+            <div class="font-bold text-xs text-amber-950 flex items-center justify-between">
+              <span>Admin Web Command Portal</span>
+              <span class="text-[9px] bg-amber-200 text-amber-950 px-1.5 py-0.5 rounded font-mono font-bold">WEBSITE</span>
             </div>
 
             <div class="space-y-1 text-[10px]">
-              <div class="bg-white border border-emerald-200 p-1.5 rounded font-medium text-stone-800">
-                📊 Live Sector Dashboard & Leaflet Map
+              <div class="bg-white border border-amber-200 p-1.5 rounded font-medium text-stone-800">
+                📊 Live Sector Map & 90-Min Graph
               </div>
-              <div class="bg-white border border-emerald-200 p-1.5 rounded font-medium text-stone-800">
-                📈 90-Min Predictive Recharts Timeline
-              </div>
-              <div class="bg-white border border-emerald-200 p-1.5 rounded font-medium text-stone-800">
+              <div class="bg-white border border-amber-200 p-1.5 rounded font-bold text-amber-950">
                 🎛️ Admin Review & Dispatch Control
               </div>
+              <div class="bg-white border border-amber-200 p-1.5 rounded font-mono text-[9px] text-stone-700">
+                🔍 RAG SOP Search & Manual Overrides
+              </div>
             </div>
           </div>
 
-          <!-- Box 2: Citizen Mobile App -->
-          <div class="bg-emerald-50/80 border border-emerald-300 rounded-xl p-3 space-y-2">
+          <!-- Citizen Mobile App Box -->
+          <div class="bg-emerald-50/90 border-2 border-emerald-300 rounded-xl p-3 space-y-2 shadow-xs">
             <div class="font-bold text-xs text-emerald-950 flex items-center justify-between">
               <span>Citizen Mobile App</span>
-              <span class="text-[9px] bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded font-mono">Android</span>
+              <span class="text-[9px] bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded font-mono font-bold">ANDROID APP</span>
             </div>
 
             <div class="space-y-1 text-[10px]">
-              <div class="bg-white border border-emerald-200 p-1.5 rounded font-medium text-stone-800">
-                🔔 Multilingual Advisory (EN / MR / HI)
+              <div class="bg-white border border-emerald-200 p-1.5 rounded font-bold text-emerald-950">
+                🔔 Cell Broadcast Push (EN / MR / HI)
               </div>
               <div class="bg-white border border-emerald-200 p-1.5 rounded font-medium text-stone-800">
-                🏥 Shelter Finder & Evacuation Route
+                🏥 Safe Shelter & Evacuation Route
               </div>
             </div>
           </div>
 
           <div class="text-center pt-1 border-t border-emerald-100">
-            <span class="text-[10px] font-mono font-bold text-emerald-900">HTTP / REST API Sync</span>
+            <span class="text-[10px] font-mono font-bold text-amber-900">🔄 Human Approval Feedback Loop</span>
           </div>
 
         </div>
@@ -177,13 +217,12 @@
       <!-- ZONE 3: Backend (Application Layer) -->
       <div class="bg-purple-50/60 border-2 border-purple-300 rounded-xl p-4 flex flex-col justify-between space-y-4">
         
-        <!-- Zone Title Header -->
+        <!-- Header -->
         <div class="text-center border-b border-purple-300 pb-2">
           <div class="text-xs font-black uppercase text-purple-800 tracking-wider font-mono">Zone 3</div>
           <div class="text-sm font-bold text-purple-950">Backend (Application Layer)</div>
         </div>
 
-        <!-- Outer Backend Container -->
         <div class="border-2 border-purple-400 bg-white rounded-2xl p-4 space-y-2 shadow-sm flex-1 flex flex-col justify-between">
           
           <div class="text-center border-b border-purple-200 pb-1.5">
@@ -191,91 +230,98 @@
             <div class="text-[10px] font-semibold text-purple-800">(Node.js / Python FastAPI)</div>
           </div>
 
-          <!-- Top API Gateway Box -->
-          <div class="bg-purple-200/80 border-2 border-purple-400 rounded-lg p-2 text-center">
+          <!-- API Gateway Box -->
+          <div class="bg-purple-200/90 border-2 border-purple-400 rounded-lg p-2 text-center shadow-xs">
             <div class="font-black text-xs text-purple-950">API Gateway</div>
-            <div class="text-[9px] font-mono text-purple-800">(Request Routing, Auth, Rate Limit)</div>
+            <div class="text-[9px] font-mono text-purple-900">(Routing, Auth, CAP v1.2 Parser)</div>
           </div>
 
-          <!-- Stacked Microservices -->
+          <!-- Services List -->
           <div class="space-y-1.5 text-[10px]">
             
-            <div class="bg-purple-50 border border-purple-300 p-1.5 rounded text-center font-bold text-purple-950">
-              API Ingestion & Data Preprocessor
+            <div class="bg-sky-50 border border-sky-300 p-1.5 rounded text-center font-bold text-sky-950">
+              1. API Ingestion & Data Preprocessor
             </div>
 
             <div class="bg-purple-50 border border-purple-300 p-1.5 rounded text-center font-bold text-purple-950">
-              15-90m Trajectory & Grid Normalizer
+              2. 15-90m Grid Trajectory Service
             </div>
 
             <div class="bg-purple-50 border border-purple-300 p-1.5 rounded text-center font-bold text-purple-950">
-              Risk Scoring Engine (Multi-Factor Matrix)
+              3. Risk Scoring Engine (0-100 Matrix)
             </div>
 
-            <div class="bg-purple-50 border border-purple-300 p-1.5 rounded text-center font-bold text-purple-950">
-              Admin Review & Approval Workflow
+            <div class="bg-amber-50 border border-amber-300 p-1.5 rounded text-center font-bold text-amber-950">
+              4. Admin Review & Workflow Controller
             </div>
 
-            <div class="bg-purple-50 border border-purple-300 p-1.5 rounded text-center font-bold text-purple-950">
-              Notification Service (CBS Push, Audio Siren)
+            <div class="bg-emerald-50 border border-emerald-300 p-1.5 rounded text-center font-bold text-emerald-950">
+              5. Cell Broadcast Notification Service
             </div>
 
           </div>
 
           <div class="text-center pt-1 border-t border-purple-100">
-            <span class="text-[10px] font-mono font-bold text-purple-900">Data Exchange Streams</span>
+            <span class="text-[10px] font-mono font-bold text-purple-900">Bidirectional Data Sync</span>
           </div>
 
         </div>
 
       </div>
 
-      <!-- ZONE 4: Data & Intelligence Layer (The "Brain") -->
+      <!-- ZONE 4: Data & Intelligence Layer (The "Brain" + RAG Engine) -->
       <div class="bg-sky-50/60 border-2 border-sky-300 rounded-xl p-4 flex flex-col justify-between space-y-4">
         
-        <!-- Zone Title Header -->
+        <!-- Header -->
         <div class="text-center border-b border-sky-300 pb-2">
           <div class="text-xs font-black uppercase text-sky-800 tracking-wider font-mono">Zone 4</div>
-          <div class="text-sm font-bold text-sky-950">Data & Intelligence Layer ("The Brain")</div>
+          <div class="text-sm font-bold text-sky-950">Data & Intelligence ("The Brain")</div>
         </div>
 
-        <!-- AI Engine Container Card -->
-        <div class="border-2 border-sky-400 bg-sky-100/70 rounded-2xl p-4 space-y-3 shadow-sm flex-1 flex flex-col justify-between">
+        <div class="border-2 border-sky-400 bg-sky-100/80 rounded-2xl p-4 space-y-3 shadow-sm flex-1 flex flex-col justify-between">
           
+          <!-- AI Engine Header -->
           <div class="text-center border-b border-sky-300 pb-2">
-            <div class="w-10 h-10 mx-auto bg-sky-500 rounded-full flex items-center justify-center text-white text-lg mb-1 shadow-xs">
+            <div class="w-10 h-10 mx-auto bg-sky-600 rounded-full flex items-center justify-center text-white text-xl mb-1 shadow-xs">
               🧠
             </div>
-            <span class="text-xs font-black text-sky-950 font-mono">AI/ML Intelligence Engine</span>
-            <div class="text-[9px] font-mono text-sky-800 font-bold">Tech: PyTorch, ConvLSTM, Transformer, pgvector</div>
+            <span class="text-xs font-black text-sky-950 font-mono">AI/ML Intelligence Core</span>
+            <div class="text-[9px] font-mono text-sky-900 font-bold">Tech: PyTorch, ConvLSTM, Transformer, pgvector</div>
           </div>
 
+          <!-- AI & RAG Subsystem Cards -->
           <div class="space-y-2 text-[10px]">
             
-            <div class="bg-white border border-sky-300 p-2 rounded-lg space-y-0.5">
-              <div class="font-extrabold text-sky-950">Nowcasting Trajectory Model</div>
-              <div class="text-[9px] text-stone-600">(Analyzes Weather Radar + Rain Rate)</div>
+            <div class="bg-white border border-purple-300 p-2 rounded-lg space-y-0.5 shadow-2xs">
+              <div class="font-extrabold text-purple-950">1. Spatial-Temporal Nowcasting Model</div>
+              <div class="text-[9px] text-stone-600">ConvLSTM Model predicts 15-90 min rain vectors</div>
             </div>
 
-            <div class="bg-white border border-sky-300 p-2 rounded-lg space-y-0.5">
-              <div class="font-extrabold text-sky-950">Multi-Factor Risk Assessment</div>
-              <div class="text-[9px] text-stone-600">(Elevation + Rain + Pressure + Soil)</div>
+            <div class="bg-white border border-amber-300 p-2 rounded-lg space-y-0.5 shadow-2xs">
+              <div class="font-extrabold text-amber-950">2. Multi-Factor Risk Evaluator</div>
+              <div class="text-[9px] text-stone-600">Scores Rain 35%, Elevation 25%, Pressure 20%, Soil 20%</div>
             </div>
 
-            <div class="bg-white border border-sky-300 p-2 rounded-lg space-y-0.5">
-              <div class="font-extrabold text-sky-950">RAG Vector Advisory Engine</div>
-              <div class="text-[9px] text-stone-600">(Generates Disaster SOP Guidance)</div>
+            <!-- PROMINENT RAG VECTOR ENGINE BOX -->
+            <div class="bg-teal-50 border-2 border-teal-500 p-2.5 rounded-xl space-y-1 shadow-sm">
+              <div class="flex items-center justify-between">
+                <span class="font-black text-xs text-teal-950">3. RAG Vector SOP Engine</span>
+                <span class="text-[9px] bg-teal-200 text-teal-900 px-1.5 py-0.5 rounded font-mono font-bold">RAG LOOP</span>
+              </div>
+              <div class="text-[9px] text-teal-900 font-medium leading-tight">
+                Queries Vector Embeddings of Historical Flood Guidelines & SOP Documents to inject exact citizen advisories.
+              </div>
             </div>
 
           </div>
 
-          <!-- App Database Cylinder -->
-          <div class="bg-white border-2 border-sky-400 rounded-xl p-2.5 text-center shadow-2xs">
+          <!-- PostgreSQL & Vector DB Cylinder -->
+          <div class="bg-white border-2 border-sky-500 rounded-xl p-2.5 text-center shadow-2xs">
             <div class="w-6 h-6 mx-auto bg-sky-200 border border-sky-400 rounded-full flex items-center justify-center text-xs mb-0.5">
               🛢️
             </div>
             <div class="font-black text-xs text-sky-950">PostgreSQL & Vector DB</div>
-            <div class="text-[9px] text-stone-600 font-mono">Telemetry History & SOP Embeddings</div>
+            <div class="text-[9px] text-stone-600 font-mono font-bold">Telemetry Logs & Vector Embeddings</div>
           </div>
 
         </div>
@@ -284,16 +330,18 @@
 
     </div>
 
-    <!-- Data Flow Arrows Footer Banner -->
-    <div class="mt-6 pt-4 border-t-2 border-stone-200 text-center">
-      <div class="inline-flex items-center space-x-2 sm:space-x-4 bg-stone-100 border border-stone-300 rounded-full px-6 py-2 shadow-2xs text-stone-800 font-mono text-[11px] font-bold">
-        <span>Zone 1 Services</span>
-        <span>──►</span>
-        <span>Zone 2 UI Apps</span>
-        <span>──►</span>
-        <span>Zone 3 Backend API</span>
-        <span>──►</span>
-        <span>Zone 4 AI Engine & DB</span>
+    <!-- Step-by-Step Sequence Banner for SIH Interviewer -->
+    <div class="mt-6 pt-4 border-t-2 border-stone-200">
+      <div class="bg-stone-900 text-amber-100 rounded-xl p-3 text-center shadow-md font-mono text-[11px] font-bold flex flex-wrap items-center justify-center gap-2">
+        <span class="bg-sky-700 text-white px-2 py-0.5 rounded">1. Weather API Stream</span>
+        <span>►</span>
+        <span class="bg-purple-700 text-white px-2 py-0.5 rounded">2. ConvLSTM Nowcast</span>
+        <span>►</span>
+        <span class="bg-teal-700 text-white px-2 py-0.5 rounded">3. RAG SOP Retrieval</span>
+        <span>►</span>
+        <span class="bg-amber-700 text-white px-2 py-0.5 rounded">4. Admin Approval Loop</span>
+        <span>►</span>
+        <span class="bg-emerald-700 text-white px-2 py-0.5 rounded">5. Multilingual Android Push</span>
       </div>
     </div>
 
