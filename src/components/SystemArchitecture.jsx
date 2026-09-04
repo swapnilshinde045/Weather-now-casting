@@ -1,5 +1,5 @@
 import React from 'react';
-import { Globe } from 'lucide-react';
+import { Globe, CloudRain } from 'lucide-react';
 
 export const SystemArchitecture = () => {
   return (
@@ -9,10 +9,10 @@ export const SystemArchitecture = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 pb-4">
         <div>
           <h2 className="text-lg font-extrabold text-stone-900">
-            Software System Architecture Diagram
+            4-Zone System Architecture Diagram (AGNI-CAST)
           </h2>
           <p className="text-xs text-stone-500 font-mono mt-0.5">
-            100% Software Architecture (WEBSITE FOR ADMIN & ANDROID APP FOR USERS)
+            Zone 1: Services ──► Zone 2: Frontend ──► Zone 3: Backend ──► Zone 4: AI & Database
           </p>
         </div>
 
@@ -22,148 +22,195 @@ export const SystemArchitecture = () => {
           rel="noreferrer"
           className="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-amber-100 text-xs font-bold rounded-lg shadow-2xs transition flex items-center space-x-1.5 cursor-pointer"
         >
-          <span>Print / Export PDF Page</span>
+          <span>Print / Export PPT PDF</span>
           <Globe className="w-3.5 h-3.5 text-amber-400" />
         </a>
       </div>
 
-      {/* Embedded Render of the Schematic Canvas */}
-      <div className="max-w-5xl mx-auto p-4 sm:p-8 relative min-h-[920px] bg-white border border-stone-300 rounded-xl shadow-xs overflow-x-auto">
+      {/* 4 Zone Columns Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-stretch relative">
         
-        {/* SVG Connector Lines Overlay */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none z-10 hidden sm:block" style={{ minHeight: '920px' }}>
-          <defs>
-            <marker id="arrowhead-sw" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-              <polygon points="0 0, 8 4, 0 8" fill="#444444" />
-            </marker>
-          </defs>
-
-          {/* Arrow 1: Green Box 1 to Controller */}
-          <path d="M 520 160 C 440 160, 420 185, 365 185" fill="none" stroke="#444444" strokeWidth="1.5" markerEnd="url(#arrowhead-sw)" />
-
-          {/* Arrow 2: Green Box 2 to Controller */}
-          <path d="M 740 160 C 600 160, 440 185, 365 195" fill="none" stroke="#444444" strokeWidth="1.5" markerEnd="url(#arrowhead-sw)" />
-
-          {/* Arrow 3: Controller to Cloud DB */}
-          <path d="M 270 220 C 270 250, 270 280, 270 320" fill="none" stroke="#444444" strokeWidth="1.5" markerEnd="url(#arrowhead-sw)" />
-
-          {/* Arrow 4: Controller to Red Box 1 */}
-          <path d="M 365 210 C 420 250, 520 330, 560 340" fill="none" stroke="#444444" strokeWidth="1.5" markerEnd="url(#arrowhead-sw)" />
-
-          {/* Arrow 5: Controller to Red Box 2 */}
-          <path d="M 365 215 C 480 260, 680 330, 770 340" fill="none" stroke="#444444" strokeWidth="1.5" markerEnd="url(#arrowhead-sw)" />
-
-          {/* Arrow 6: Cloud DB to Purple Box 1 */}
-          <path d="M 220 390 C 180 430, 160 470, 160 510" fill="none" stroke="#444444" strokeWidth="1.5" markerEnd="url(#arrowhead-sw)" />
-
-          {/* Arrow 7: Cloud DB to Purple Box 2 */}
-          <path d="M 320 390 C 360 430, 390 470, 390 510" fill="none" stroke="#444444" strokeWidth="1.5" markerEnd="url(#arrowhead-sw)" />
-
-          {/* Arrow 8: Purple Box 1 to Circle */}
-          <path d="M 170 580 C 170 630, 170 670, 170 710" fill="none" stroke="#444444" strokeWidth="1.5" markerEnd="url(#arrowhead-sw)" />
-        </svg>
-
-        {/* TOP RIGHT BOX */}
-        <div className="sm:absolute top-[100px] right-[30px] w-full sm:w-[500px] h-[310px] border border-stone-500 bg-white p-4 my-4 sm:my-0">
-          <div className="text-center font-bold text-xs text-stone-800 mb-3 border-b border-stone-200 pb-1">
-            External Weather Data APIs & Alert Dispatch Outlets
+        {/* ZONE 1 */}
+        <div className="bg-stone-50/80 border-2 border-stone-300 rounded-xl p-4 flex flex-col justify-between space-y-6">
+          <div className="text-center border-b border-stone-300 pb-2">
+            <div className="text-xs font-black uppercase text-stone-700 tracking-wider font-mono">Zone 1</div>
+            <div className="text-sm font-bold text-stone-900">Users & External Services</div>
           </div>
 
-          <div className="flex justify-between space-x-3 mb-2">
-            <div className="w-[220px] h-[65px] border border-emerald-700 bg-emerald-100/70 p-2 text-center text-xs text-stone-900 flex flex-col justify-center">
-              <div className="font-bold text-emerald-950">Open-Meteo & Weather APIs</div>
-              <div className="text-[10px] text-stone-700">Fetches Live Temp, Humidity & Rain</div>
+          <div className="border-2 border-dashed border-sky-400 bg-sky-50/80 rounded-2xl p-4 space-y-2 text-center shadow-2xs">
+            <div className="text-xs font-extrabold text-sky-950 flex items-center justify-center gap-1.5">
+              <CloudRain className="w-4 h-4 text-sky-700" />
+              <span>Third-Party Services</span>
             </div>
 
-            <div className="w-[220px] h-[65px] border border-emerald-700 bg-emerald-100/70 p-2 text-center text-xs text-stone-900 flex flex-col justify-center">
-              <div className="font-bold text-emerald-950">Doppler Radar & Satellite API</div>
-              <div className="text-[10px] text-stone-700">Streams Cloud Motion & Rain Grid</div>
+            <div className="space-y-1.5 pt-1">
+              <div className="bg-white border border-sky-300 rounded-lg p-2 text-[11px] font-bold text-sky-900 shadow-2xs">
+                Open-Meteo Weather API
+              </div>
+              <div className="bg-white border border-sky-300 rounded-lg p-2 text-[11px] font-bold text-sky-900 shadow-2xs">
+                IMD Doppler Radar Grid API
+              </div>
+              <div className="bg-white border border-sky-300 rounded-lg p-2 text-[11px] font-bold text-sky-900 shadow-2xs">
+                GIS Topography API
+              </div>
             </div>
           </div>
 
-          <div className="flex justify-between text-[10px] font-mono text-stone-700 px-6 mb-6">
-            <span>Reads Weather API Stream</span>
-            <span>Detects Cloudburst Intensity</span>
-          </div>
-
-          <div className="flex justify-between text-[10px] font-mono text-stone-700 px-6 mb-2">
-            <span>Evaluates Risk Thresholds</span>
-            <span>Dispatches Push Advisory</span>
-          </div>
-
-          <div className="flex justify-between space-x-3">
-            <div className="w-[210px] h-[55px] border border-rose-600 bg-rose-100/80 p-2 text-center text-xs text-stone-900 flex flex-col justify-center">
-              <div className="font-bold text-rose-950">Admin Web Dashboard Alerts</div>
-              <div className="text-[10px] text-rose-800">Displays Emergency Banners</div>
+          <div className="space-y-3 pt-2">
+            <div className="bg-white border-2 border-amber-300 rounded-xl p-3 flex items-center space-x-3 shadow-2xs">
+              <div className="w-8 h-8 rounded-full bg-amber-100 border border-amber-400 flex items-center justify-center font-bold text-amber-900 text-xs">
+                👨‍💼
+              </div>
+              <div>
+                <div className="font-bold text-xs text-amber-950">Disaster Authority Admin</div>
+                <div className="text-[10px] text-stone-600">Interacts with Admin Dashboard</div>
+              </div>
             </div>
 
-            <div className="w-[210px] h-[55px] border border-rose-600 bg-rose-100/80 p-2 text-center text-xs text-stone-900 flex flex-col justify-center">
-              <div className="font-bold text-rose-950">Android App Push Notifications</div>
-              <div className="text-[10px] text-rose-800">Cell Broadcast System (CAP v1.2)</div>
+            <div className="bg-white border-2 border-emerald-300 rounded-xl p-3 flex items-center space-x-3 shadow-2xs">
+              <div className="w-8 h-8 rounded-full bg-emerald-100 border border-emerald-400 flex items-center justify-center font-bold text-emerald-900 text-xs">
+                🧑‍🌾
+              </div>
+              <div>
+                <div className="font-bold text-xs text-emerald-950">Citizens & First Responders</div>
+                <div className="text-[10px] text-stone-600">Receives Multilingual Push Bulletins</div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* TOP LEFT / MIDDLE BOX */}
-        <div className="sm:absolute top-[135px] left-[170px] w-full sm:w-[200px] h-[85px] border border-stone-500 bg-white p-2 my-4 sm:my-0">
-          <div className="text-center font-bold text-xs text-stone-800 mb-1">
-            Backend Ingestion Pipeline
-          </div>
-          <div className="w-full h-[45px] border border-amber-600 bg-amber-100/80 text-stone-900 font-bold text-xs flex flex-col items-center justify-center text-center p-1">
-            <span>API Fetcher & Preprocessor</span>
-            <span className="text-[9px] font-normal text-stone-700">Parses JSON & Coordinates</span>
-          </div>
-        </div>
-
-        <div className="sm:absolute top-[235px] left-[180px] text-[10px] font-mono text-stone-700 text-center font-semibold hidden sm:block">
-          Uploads JSON Telemetry Stream <br /> via HTTP / REST
-        </div>
-
-        {/* MIDDLE LEFT BOX */}
-        <div className="sm:absolute top-[310px] left-[110px] w-full sm:w-[320px] h-[100px] border border-stone-500 bg-white p-2 my-4 sm:my-0">
-          <div className="text-center font-bold text-xs text-stone-800 mb-2">
-            Cloud Infrastructure & Database
-          </div>
-          <div className="w-[170px] h-[50px] mx-auto border border-blue-600 bg-blue-100/90 rounded-[50%] flex flex-col items-center justify-center text-xs text-blue-950 font-bold text-center">
-            <span>PostgreSQL & Vector DB</span>
-            <span className="text-[9px] font-normal text-blue-800">Telemetry Logs & RAG Index</span>
-          </div>
-        </div>
-
-        <div className="sm:absolute top-[430px] left-[95px] text-[10px] font-mono text-stone-700 font-semibold hidden sm:block">
-          Fetches Real-Time Data
-        </div>
-        <div className="sm:absolute top-[430px] left-[300px] text-[10px] font-mono text-stone-700 font-semibold hidden sm:block">
-          Fetches Historical & RAG SOPs
-        </div>
-
-        {/* BOTTOM LEFT BOX */}
-        <div className="sm:absolute top-[500px] left-[55px] w-full sm:w-[470px] h-[90px] border border-stone-500 bg-white p-2 my-4 sm:my-0">
-          <div className="text-center font-bold text-xs text-stone-900 mb-2">
-            User Interface (WEBSITE FOR ADMIN)
+        {/* ZONE 2 */}
+        <div className="bg-emerald-50/60 border-2 border-emerald-300 rounded-xl p-4 flex flex-col justify-between space-y-4">
+          <div className="text-center border-b border-emerald-300 pb-2">
+            <div className="text-xs font-black uppercase text-emerald-800 tracking-wider font-mono">Zone 2</div>
+            <div className="text-sm font-bold text-emerald-950">Frontend (Presentation Layer)</div>
           </div>
 
-          <div className="flex justify-between space-x-3 px-1">
-            <div className="w-[210px] h-[45px] border border-purple-600 bg-purple-100/80 text-xs text-stone-900 flex flex-col items-center justify-center text-center">
-              <span className="font-bold">React Dashboard & Leaflet Map</span>
-              <span className="text-[9px] text-stone-700">Real-Time Risk Monitoring</span>
+          <div className="border-2 border-emerald-400 bg-white rounded-2xl p-4 space-y-4 shadow-2xs flex-1 flex flex-col justify-between">
+            <div className="text-center border-b border-emerald-200 pb-2">
+              <span className="text-xs font-black text-emerald-950 font-mono">AGNI-CAST UI Apps</span>
+              <div className="text-[10px] font-semibold text-emerald-800">(React 19 / Vite / Android)</div>
             </div>
 
-            <div className="w-[210px] h-[45px] border border-purple-600 bg-purple-100/80 text-xs text-stone-900 flex flex-col items-center justify-center text-center">
-              <span className="font-bold">Admin Alert Review & RAG Search</span>
-              <span className="text-[9px] text-stone-700">Approve & Broadcast Bulletins</span>
+            <div className="bg-emerald-50/80 border border-emerald-300 rounded-xl p-3 space-y-2">
+              <div className="font-bold text-xs text-emerald-950 flex items-center justify-between">
+                <span>Admin Web Portal</span>
+                <span className="text-[9px] bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded font-mono">Web</span>
+              </div>
+              <div className="space-y-1 text-[10px]">
+                <div className="bg-white border border-emerald-200 p-1.5 rounded font-medium text-stone-800">
+                  📊 Live Sector Dashboard & Leaflet Map
+                </div>
+                <div className="bg-white border border-emerald-200 p-1.5 rounded font-medium text-stone-800">
+                  📈 90-Min Predictive Recharts Timeline
+                </div>
+                <div className="bg-white border border-emerald-200 p-1.5 rounded font-medium text-stone-800">
+                  🎛️ Admin Review & Dispatch Control
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-emerald-50/80 border border-emerald-300 rounded-xl p-3 space-y-2">
+              <div className="font-bold text-xs text-emerald-950 flex items-center justify-between">
+                <span>Citizen Mobile App</span>
+                <span className="text-[9px] bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded font-mono">Android</span>
+              </div>
+              <div className="space-y-1 text-[10px]">
+                <div className="bg-white border border-emerald-200 p-1.5 rounded font-medium text-stone-800">
+                  🔔 Multilingual Advisory (EN / MR / HI)
+                </div>
+                <div className="bg-white border border-emerald-200 p-1.5 rounded font-medium text-stone-800">
+                  🏥 Shelter Finder & Evacuation Route
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center pt-1 border-t border-emerald-100">
+              <span className="text-[10px] font-mono font-bold text-emerald-900">HTTP / REST API Sync</span>
             </div>
           </div>
         </div>
 
-        <div className="sm:absolute top-[605px] left-[85px] text-[10px] font-mono text-stone-800 text-center font-bold hidden sm:block">
-          Displays SAFE / MODERATE / HIGH / EXTREME Alerts & Sends Multilingual Mobile Push
+        {/* ZONE 3 */}
+        <div className="bg-purple-50/60 border-2 border-purple-300 rounded-xl p-4 flex flex-col justify-between space-y-4">
+          <div className="text-center border-b border-purple-300 pb-2">
+            <div className="text-xs font-black uppercase text-purple-800 tracking-wider font-mono">Zone 3</div>
+            <div className="text-sm font-bold text-purple-950">Backend (Application Layer)</div>
+          </div>
+
+          <div className="border-2 border-purple-400 bg-white rounded-2xl p-4 space-y-2 shadow-2xs flex-1 flex flex-col justify-between">
+            <div className="text-center border-b border-purple-200 pb-1.5">
+              <span className="text-xs font-black text-purple-950 font-mono">Backend Services</span>
+              <div className="text-[10px] font-semibold text-purple-800">(Node.js / Python FastAPI)</div>
+            </div>
+
+            <div className="bg-purple-200/80 border-2 border-purple-400 rounded-lg p-2 text-center">
+              <div className="font-black text-xs text-purple-950">API Gateway</div>
+              <div className="text-[9px] font-mono text-purple-800">(Routing, Auth, Rate Limit)</div>
+            </div>
+
+            <div className="space-y-1.5 text-[10px]">
+              <div className="bg-purple-50 border border-purple-300 p-1.5 rounded text-center font-bold text-purple-950">
+                API Ingestion & Preprocessor
+              </div>
+              <div className="bg-purple-50 border border-purple-300 p-1.5 rounded text-center font-bold text-purple-950">
+                15-90m Trajectory Normalizer
+              </div>
+              <div className="bg-purple-50 border border-purple-300 p-1.5 rounded text-center font-bold text-purple-950">
+                Risk Scoring Matrix (0-100 Rating)
+              </div>
+              <div className="bg-purple-50 border border-purple-300 p-1.5 rounded text-center font-bold text-purple-950">
+                Admin Review Workflow Service
+              </div>
+              <div className="bg-purple-50 border border-purple-300 p-1.5 rounded text-center font-bold text-purple-950">
+                Notification & Audio Siren Service
+              </div>
+            </div>
+
+            <div className="text-center pt-1 border-t border-purple-100">
+              <span className="text-[10px] font-mono font-bold text-purple-900">Data Exchange Streams</span>
+            </div>
+          </div>
         </div>
 
-        {/* BOTTOM CIRCLE */}
-        <div className="sm:absolute top-[700px] left-[95px] w-[150px] h-[150px] border border-stone-500 bg-stone-100 rounded-full flex flex-col items-center justify-center text-center text-xs text-stone-900 font-bold p-3 shadow-2xs my-4 sm:my-0 mx-auto">
-          <span>ANDROID APP FOR USERS</span>
-          <span className="text-[10px] font-normal text-stone-600 mt-1">Citizens & Disaster Officers (EN / MR / HI)</span>
+        {/* ZONE 4 */}
+        <div className="bg-sky-50/60 border-2 border-sky-300 rounded-xl p-4 flex flex-col justify-between space-y-4">
+          <div className="text-center border-b border-sky-300 pb-2">
+            <div className="text-xs font-black uppercase text-sky-800 tracking-wider font-mono">Zone 4</div>
+            <div className="text-sm font-bold text-sky-950">Data & Intelligence ("The Brain")</div>
+          </div>
+
+          <div className="border-2 border-sky-400 bg-sky-100/70 rounded-2xl p-4 space-y-3 shadow-2xs flex-1 flex flex-col justify-between">
+            <div className="text-center border-b border-sky-300 pb-2">
+              <div className="w-9 h-9 mx-auto bg-sky-500 rounded-full flex items-center justify-center text-white text-base mb-1 shadow-2xs">
+                🧠
+              </div>
+              <span className="text-xs font-black text-sky-950 font-mono">AI/ML Intelligence Engine</span>
+              <div className="text-[9px] font-mono text-sky-800 font-bold">Tech: PyTorch, ConvLSTM, Transformer, pgvector</div>
+            </div>
+
+            <div className="space-y-2 text-[10px]">
+              <div className="bg-white border border-sky-300 p-2 rounded-lg space-y-0.5">
+                <div className="font-extrabold text-sky-950">Nowcasting Trajectory Model</div>
+                <div className="text-[9px] text-stone-600">(Analyzes Radar Grid + Rain Rate)</div>
+              </div>
+
+              <div className="bg-white border border-sky-300 p-2 rounded-lg space-y-0.5">
+                <div className="font-extrabold text-sky-950">Multi-Factor Risk Assessment</div>
+                <div className="text-[9px] text-stone-600">(Elevation + Rain + Pressure + Soil)</div>
+              </div>
+
+              <div className="bg-white border border-sky-300 p-2 rounded-lg space-y-0.5">
+                <div className="font-extrabold text-sky-950">RAG Vector Advisory Engine</div>
+                <div className="text-[9px] text-stone-600">(Generates Disaster SOP Guidance)</div>
+              </div>
+            </div>
+
+            <div className="bg-white border-2 border-sky-400 rounded-xl p-2 text-center shadow-2xs">
+              <div className="font-black text-xs text-sky-950">PostgreSQL & Vector DB</div>
+              <div className="text-[9px] text-stone-600 font-mono">Telemetry History & SOP Embeddings</div>
+            </div>
+          </div>
         </div>
 
       </div>
