@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SIH26077 - System Architecture & INSAT-3DR Graph RAG Flow (AGNI-CAST)</title>
+  <title>SIH26077 - System Architecture & Gemini AI Flow (AGNI-CAST)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
@@ -26,10 +26,10 @@
     <div>
       <div class="flex items-center space-x-2">
         <span class="bg-amber-800 text-white font-mono font-bold text-xs px-2.5 py-1 rounded">SIH26077</span>
-        <h1 class="text-xl font-extrabold text-stone-900 tracking-tight">Severe Weather Nowcasting Architecture & INSAT-3DR Graph RAG</h1>
+        <h1 class="text-xl font-extrabold text-stone-900 tracking-tight">Gemini AI Nowcasting Architecture & Operational Flow</h1>
       </div>
       <p class="text-xs text-stone-600 font-mono mt-1">
-        Primary Satellite: INSAT-3DR (ISRO) • RAG Type: Multimodal HyDE Graph RAG • Threat Focus: Severe Thunderstorms & Cloudbursts
+        Primary Satellite: INSAT-3DR (ISRO) • AI Engine: Google Gemini API (No Model Training) • Multilingual RAG advisories
       </p>
     </div>
 
@@ -45,11 +45,11 @@
     <!-- Title Header -->
     <div class="text-center border-b-2 border-stone-200 pb-4 mb-6 space-y-1">
       <h2 class="text-xl font-black text-stone-900 uppercase font-mono tracking-tight">
-        SIH26077: AGNI-CAST SYSTEM ARCHITECTURE & MULTIMODAL GRAPH RAG PIPELINE
+        SIH26077: AGNI-CAST SYSTEM ARCHITECTURE & GEMINI AI PIPELINE
       </h2>
       <p class="text-xs font-semibold text-stone-700">
-        Primary Satellite Data Stream: <span class="bg-blue-100 text-blue-950 font-mono font-bold px-2 py-0.5 rounded border border-blue-300">INSAT-3DR (ISRO Imager/Sounder)</span>
-        • RAG Architecture: <span class="bg-teal-100 text-teal-950 font-mono font-bold px-2 py-0.5 rounded border border-teal-300">Multimodal HyDE Graph RAG</span>
+        Primary Satellite Data Stream: <span class="bg-blue-100 text-blue-950 font-mono font-bold px-2 py-0.5 rounded border border-blue-300">INSAT-3DR (ISRO WV, TIR-1, TIR-2, MIR)</span>
+        • AI Engine: <span class="bg-purple-100 text-purple-950 font-mono font-bold px-2 py-0.5 rounded border border-purple-300">Google Gemini API (Zero Model Training)</span>
       </p>
     </div>
 
@@ -73,70 +73,70 @@
               <span class="text-[9px] bg-blue-700 text-white px-1.5 py-0.5 rounded font-mono font-bold">ISRO STREAM</span>
             </div>
             <p class="text-[10px] text-blue-950 font-semibold leading-tight">
-              Infra-Red (MIR/TIR) Hydro-Meteorological Imager & Sounder telemetry for Cloudburst & Thunderstorm convection detection.
+              WV (6.5–7.0µm), TIR-1 (10.2–11.2µm), TIR-2 (11.5–12.5µm) & MIR (3.8–4.0µm) bands for cloud top & moisture monitoring.
             </p>
           </div>
 
           <!-- Open-Meteo Weather API -->
           <div class="bg-white border-2 border-sky-300 rounded-xl p-3 space-y-1 shadow-2xs">
             <div class="font-extrabold text-xs text-sky-950 flex items-center justify-between">
-              <span>Open-Meteo Weather API</span>
+              <span>Open-Meteo & IMDAA Data</span>
               <span class="text-[9px] bg-sky-100 text-sky-800 px-1.5 py-0.5 rounded font-mono">Live Stream</span>
             </div>
-            <p class="text-[10px] text-stone-600">Fetches Live Temp, Humidity, Rain Rate (mm/h) & Wind Speed</p>
+            <p class="text-[10px] text-stone-600">Temp, RH, CAPE, CIN, Wind Shear & GSMaP-ISRO Rainfall</p>
           </div>
 
-          <!-- IMD Doppler Radar & GIS Topography -->
+          <!-- GIS Topography Data -->
           <div class="bg-white border-2 border-sky-300 rounded-xl p-3 space-y-1 shadow-2xs">
-            <div class="font-extrabold text-xs text-sky-950">IMD Radar Grid & GIS Topography</div>
+            <div class="font-extrabold text-xs text-sky-950">CartoDEM / SRTM Elevation</div>
             <p class="text-[10px] text-stone-600">Low-lying drainage basin elevation grid for Flash Flood mapping</p>
           </div>
 
         </div>
 
         <div class="bg-sky-100 border border-sky-300 p-2 rounded-lg text-center text-[10px] font-mono font-bold text-sky-950">
-          ──► Feeds INSAT-3DR & Telemetry to Graph RAG DB
+          ──► Streams Data to Gemini AI Engine
         </div>
 
       </div>
 
-      <!-- STEP 2: Database & Multimodal HyDE Graph RAG -->
+      <!-- STEP 2: Database & Gemini AI Prediction Core -->
       <div class="bg-purple-50/70 border-2 border-purple-300 rounded-xl p-4 flex flex-col justify-between space-y-4">
         
         <div class="text-center border-b border-purple-300 pb-2">
           <div class="text-xs font-black uppercase text-purple-800 tracking-wider font-mono">STEP 2 & 3</div>
-          <div class="text-sm font-bold text-purple-950">Multimodal HyDE Graph RAG Engine</div>
+          <div class="text-sm font-bold text-purple-950">Gemini AI Engine & Database</div>
         </div>
 
         <div class="space-y-3 flex-1 flex flex-col justify-between">
           
-          <!-- SPECIFIC RAG TYPE CARD -->
-          <div class="bg-teal-50 border-2 border-teal-500 rounded-xl p-3 space-y-1.5 shadow-sm">
-            <div class="font-black text-xs text-teal-950 flex items-center justify-between">
-              <span>Multimodal HyDE Graph RAG</span>
-              <span class="text-[9px] bg-teal-200 text-teal-950 px-1.5 py-0.5 rounded font-mono font-bold">RAG TYPE</span>
+          <!-- GEMINI API KEY INTEGRATION CARD -->
+          <div class="bg-purple-100 border-2 border-purple-500 rounded-xl p-3 space-y-1.5 shadow-sm">
+            <div class="font-black text-xs text-purple-950 flex items-center justify-between">
+              <span>Google Gemini API Key</span>
+              <span class="text-[9px] bg-purple-700 text-white px-1.5 py-0.5 rounded font-mono font-bold">GEMINI AI</span>
             </div>
-            <p class="text-[10px] text-teal-950 font-medium leading-tight">
-              <strong>Hybrid Dense-Sparse Vector Retrieval + Hypothetical Document Embeddings (HyDE) + SOP Knowledge Graph</strong>.
+            <p class="text-[10px] text-purple-950 font-semibold leading-tight">
+              Replaces custom model training with zero-shot Gemini 1.5/2.0 Flash reasoning over INSAT-3DR telemetry.
             </p>
-            <div class="text-[9px] text-teal-900 font-mono pt-0.5">
-              Indexes INSAT-3DR Telemetry + ISRO Flood Manuals + Municipal SOP Guidelines.
+            <div class="text-[9px] text-purple-900 font-mono pt-0.5">
+              Generates 15-90 min nowcasts & 0-100 risk scores.
             </div>
+          </div>
+
+          <!-- RAG Vector Engine -->
+          <div class="bg-teal-50 border border-teal-400 rounded-xl p-2.5 space-y-1 shadow-2xs">
+            <div class="font-extrabold text-xs text-teal-950">Multimodal RAG SOP Index</div>
+            <p class="text-[9px] text-teal-900">Retrieves ISRO flood manuals & municipal disaster guidelines</p>
           </div>
 
           <!-- Main Database Cylinder -->
-          <div class="bg-white border-2 border-purple-400 rounded-xl p-3 text-center space-y-1 shadow-2xs">
-            <div class="w-7 h-7 mx-auto bg-purple-200 border border-purple-400 rounded-full flex items-center justify-center text-xs">
+          <div class="bg-white border-2 border-purple-400 rounded-xl p-2.5 text-center space-y-1 shadow-2xs">
+            <div class="w-6 h-6 mx-auto bg-purple-200 border border-purple-400 rounded-full flex items-center justify-center text-xs">
               🛢️
             </div>
-            <div class="font-black text-xs text-purple-950">PostgreSQL + pgvector / ChromaDB</div>
-            <p class="text-[10px] text-stone-600 font-mono">Stores Real-Time Values, Risk Vectors & Graph Embeddings</p>
-          </div>
-
-          <!-- AI ConvLSTM Model -->
-          <div class="bg-purple-100/90 border border-purple-300 rounded-xl p-2.5 space-y-1 text-center">
-            <div class="font-bold text-xs text-purple-950">ConvLSTM Nowcasting AI Core</div>
-            <p class="text-[9px] text-purple-800">Forecasts 15-90 min Cloudburst & Flash Flood Trajectories</p>
+            <div class="font-black text-xs text-purple-950">PostgreSQL / SQLite DB</div>
+            <p class="text-[9px] text-stone-600 font-mono">Stores Real-Time Values & Gemini Forecast Logs</p>
           </div>
 
         </div>
@@ -159,8 +159,8 @@
           
           <!-- Real-Time Dashboard -->
           <div class="bg-white border-2 border-amber-300 rounded-xl p-3 space-y-1 shadow-2xs">
-            <div class="font-extrabold text-xs text-amber-950">Real-Time Values & Leaflet Map</div>
-            <p class="text-[10px] text-stone-600">Displays INSAT-3DR Sector Circles (🟢 SAFE → 🟣 EXTREME Cloudburst)</p>
+            <div class="font-extrabold text-xs text-amber-950">Real-Time Dashboard & Leaflet Map</div>
+            <p class="text-[10px] text-stone-600">Displays Sector Risk Circles (🟢 SAFE → 🟣 EXTREME Cloudburst)</p>
           </div>
 
           <!-- Threat Focus -->
@@ -183,7 +183,7 @@
               <span class="text-[9px] bg-amber-300 text-amber-950 px-1.5 py-0.5 rounded font-mono font-bold">DISPATCH</span>
             </div>
             <p class="text-[10px] text-amber-950 font-medium">
-              Admin reviews HyDE Graph RAG citizen advisory wording & approves broadcast.
+              Admin reviews Gemini AI advisory wording & approves cell broadcast dispatch.
             </p>
           </div>
 
@@ -248,9 +248,9 @@
       <div class="bg-stone-900 text-amber-100 rounded-xl p-3 text-center shadow-md font-mono text-[11px] font-bold flex flex-wrap items-center justify-center gap-2">
         <span class="bg-blue-700 text-white px-2 py-0.5 rounded">1. INSAT-3DR Satellite Stream</span>
         <span>►</span>
-        <span class="bg-teal-700 text-white px-2 py-0.5 rounded">2. Multimodal HyDE Graph RAG Engine</span>
+        <span class="bg-purple-700 text-white px-2 py-0.5 rounded">2. Google Gemini API Prediction Engine</span>
         <span>►</span>
-        <span class="bg-purple-700 text-white px-2 py-0.5 rounded">3. PostgreSQL Real-Time DB</span>
+        <span class="bg-teal-700 text-white px-2 py-0.5 rounded">3. PostgreSQL & RAG Vector DB</span>
         <span>►</span>
         <span class="bg-rose-700 text-white px-2 py-0.5 rounded">4. Threat Focus: Cloudburst / Flash Flood</span>
         <span>►</span>
