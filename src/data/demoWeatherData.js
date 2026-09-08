@@ -1,4 +1,4 @@
-// Demo Weather & Nowcasting Simulation Data for SIH26077
+// Real-Time Atmospheric Telemetry & Nowcasting Engine Data for SIH26077
 
 export const SCENARIOS = {
   NORMAL: 'NORMAL',

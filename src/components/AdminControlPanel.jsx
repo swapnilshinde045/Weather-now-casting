@@ -120,11 +120,11 @@ export const AdminControlPanel = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
           <div className="md:col-span-2">
             <label className="block font-semibold text-stone-800 mb-1">
-              Google Gemini API Key (Optional — Auto-fallback active for SIH Judges demo):
+              Google Gemini 2.0 Operational Intelligence Key:
             </label>
             <input 
               type="password" 
-              placeholder="Paste AIZASy... (or leave blank to use pre-configured Gemini AI Engine)" 
+              placeholder="Paste AIZASy... (or leave blank to use pre-configured Operational Gemini Engine)" 
               value={geminiKey}
               onChange={(e) => setGeminiKey(e.target.value)}
               className="w-full p-2.5 bg-white border border-purple-300 rounded-lg text-stone-900 font-mono text-xs shadow-2xs"

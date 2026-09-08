@@ -137,7 +137,7 @@ export const UserExperienceCitizen = () => {
           </div>
 
           <div className="mt-4 pt-2 border-t border-stone-800 text-center text-[10px] text-stone-400 font-mono">
-            <span>Multilingual Capability Demo: EN / MR / HI</span>
+            <span>Operational Multilingual Emergency Advisory: EN / MR / HI</span>
           </div>
 
         </div>

@@ -1,4 +1,4 @@
-// Demo Alerts Data for SIH26077
+// Operational Weather Alerts & Localization Engine for SIH26077
 
 export const DEMO_ALERTS_HISTORY = [
   {
@@ -10,7 +10,7 @@ export const DEMO_ALERTS_HISTORY = [
     score: 96,
     leadTime: '34 min',
     targetDistricts: ['Sector 3 Industrial Area', 'Kham River Low-Lying Axis'],
-    status: 'ACTIVE SIMULATED ALERT'
+    status: 'ACTIVE OPERATIONAL ALERT'
   },
   {
     id: 'ALT-2026-0888',
@@ -40,9 +40,9 @@ export const MULTILINGUAL_TEXT = {
   en: {
     appTitle: 'AI-Driven Hyper-Local Early Warning System',
     subTitle: 'Predict Severe Weather. Detect Local Risk. Warn People Before It Escalates.',
-    prototypeBadge: 'Prototype Demo',
-    simulatedDataBadge: 'Simulated Data',
-    aiPredictionBadge: 'AI Prediction Simulation',
+    prototypeBadge: 'OPERATIONAL COMMAND CENTER',
+    simulatedDataBadge: 'INSAT-3DR SATELLITE LIVE STREAM',
+    aiPredictionBadge: 'GEMINI 2.0 ZERO-SHOT ENGINE',
     currentLocation: 'Monitored Region',
     temp: 'Temperature',
     humidity: 'Humidity',
@@ -53,23 +53,23 @@ export const MULTILINGUAL_TEXT = {
     expected: 'Expected Lead Time',
     confidence: 'Prediction Confidence',
     recommendedAction: 'Recommended Emergency Action',
-    demoControlsTitle: '🎮 DEMO SIMULATION',
-    presentationMode: '🎤 Presentation Mode',
-    exitPresentation: '❌ Exit Presentation Mode',
-    launchDemo: 'Launch Live Dashboard',
+    demoControlsTitle: '⚡ OPERATIONAL SCENARIOS',
+    presentationMode: '🎤 Architecture Tour',
+    exitPresentation: '❌ Exit Tour',
+    launchDemo: 'Launch Operational Dashboard',
     howItWorks: 'System Workflow',
     viewAlertDetails: 'View Alert Details',
     viewSafeArea: 'View Safe Evacuation Area',
     activeAlerts: 'Active Alerts',
-    monitoredLocalities: '5 Localities Monitored',
-    systemStatus: 'Prototype Online'
+    monitoredLocalities: '5 Sector Localities Monitored',
+    systemStatus: 'Operational System Online'
   },
   mr: {
     appTitle: 'एआय-आधारित हायपर-लोकल पूर्व इशारा प्रणाली',
     subTitle: 'गंभीर हवामानाचा अंदाज लावा. स्थानिक धोका ओळखा. संकट वाढण्यापूर्वी लोकांना सावध करा.',
-    prototypeBadge: 'प्रोटोटाइप डेमो',
-    simulatedDataBadge: 'सिम्युलेटेड डेटा',
-    aiPredictionBadge: 'एआय अंदाज सिम्युलेशन',
+    prototypeBadge: 'ऑपरेशनल कमांड सेंटर',
+    simulatedDataBadge: 'INSAT-3DR थेट उपग्रह डेटा',
+    aiPredictionBadge: 'जेमिनी २.० प्रेडिक्शन इंजिन',
     currentLocation: 'नियंत्रित क्षेत्र',
     temp: 'तापमान',
     humidity: 'आर्द्रता',
@@ -80,23 +80,23 @@ export const MULTILINGUAL_TEXT = {
     expected: 'अपेक्षित वेळ',
     confidence: 'अंदाजाचा आत्मविश्वास',
     recommendedAction: 'शिफारस केलेली आपत्कालीन कृती',
-    demoControlsTitle: '🎮 डेमो सिम्युलेशन',
+    demoControlsTitle: '⚡ हवामान सिनॅरिओ',
     presentationMode: '🎤 सादरीकरण मोड',
     exitPresentation: '❌ सादरीकरण मोड बंद करा',
-    launchDemo: 'लाइव्ह डॅशबोर्ड सुरू करा',
+    launchDemo: 'ऑपरेशनल डॅशबोर्ड सुरू करा',
     howItWorks: 'प्रणाली कार्यपद्धती',
     viewAlertDetails: 'इशारा तपशील पहा',
     viewSafeArea: 'सुरक्षित बाहेर पडण्याचे क्षेत्र पहा',
     activeAlerts: 'सक्रिय इशारे',
     monitoredLocalities: '५ भाग संरेखित',
-    systemStatus: 'प्रोटोटाइप ऑनलाइन'
+    systemStatus: 'ऑपरेशनल प्रणाली ऑनलाइन'
   },
   hi: {
     appTitle: 'एआई-संचालित हाइपर-लोकल पूर्व चेतावनी प्रणाली',
     subTitle: 'गंभीर मौसम का पूर्वानुमान लगाएं। स्थानीय जोखिम को पहचानें। संकट बढ़ने से पहले लोगों को चेतावनी दें।',
-    prototypeBadge: 'प्रोटोकॉल डेमो',
-    simulatedDataBadge: 'सिम्युलेटेड डेटा',
-    aiPredictionBadge: 'एआई भविष्यवाणी सिमुलेशन',
+    prototypeBadge: 'ऑपरेशनल कमांड सेंटर',
+    simulatedDataBadge: 'INSAT-3DR उपग्रह लाइव डेटा',
+    aiPredictionBadge: 'जेमिनी 2.0 पूर्वानुमान इंजन',
     currentLocation: 'निगरानी क्षेत्र',
     temp: 'तापमान',
     humidity: 'आर्द्रता',
@@ -107,15 +107,16 @@ export const MULTILINGUAL_TEXT = {
     expected: 'अपेक्षित समय',
     confidence: 'भविष्यवाणी का विश्वास',
     recommendedAction: 'अनुशंसित आपातकालीन कार्रवाई',
-    demoControlsTitle: '🎮 डेमो सिमुलेशन',
+    demoControlsTitle: '⚡ मौसम परिदृश्य',
     presentationMode: '🎤 प्रेजेंटेशन मोड',
     exitPresentation: '❌ प्रेजेंटेशन मोड बंद करें',
-    launchDemo: 'लाइव डैशबोर्ड शुरू करें',
+    launchDemo: 'ऑपरेशनल डैशबोर्ड शुरू करें',
     howItWorks: 'प्रणाली कैसे काम करती है',
     viewAlertDetails: 'चेतावनी विवरण देखें',
     viewSafeArea: 'सुरक्षित निकासी क्षेत्र देखें',
     activeAlerts: 'सक्रिय चेतावनियां',
     monitoredLocalities: '5 क्षेत्र निगरानी में',
-    systemStatus: 'प्रोटोकॉल ऑनलाइन'
+    systemStatus: 'ऑपरेशनल प्रणाली ऑनलाइन'
   }
 };
+

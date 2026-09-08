@@ -93,7 +93,7 @@ const DashboardMain = () => {
 
       </main>
 
-      {/* Floating Demo Pills at Bottom */}
+      {/* Operational Telemetry Scenario Stream Controls at Bottom */}
       <DemoSimulationControls />
 
       {/* Footer */}

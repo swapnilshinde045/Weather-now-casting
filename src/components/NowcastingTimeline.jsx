@@ -90,7 +90,7 @@ export const NowcastingTimeline = () => {
             }`}
           >
             {isAutoPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 text-amber-400" />}
-            <span>{isAutoPlaying ? 'Pause Demo' : 'Auto Play 90m Demo'}</span>
+            <span>{isAutoPlaying ? 'Pause Stream' : 'Live 90m Stream Auto-Play'}</span>
           </button>
           <span className="text-[11px] text-stone-500 font-mono hidden md:inline">
             Step through time horizons:

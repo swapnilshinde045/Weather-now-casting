@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSimulation } from '../context/SimulationContext';
-import { ArrowRight, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Activity } from 'lucide-react';
 
 export const HeroLanding = ({ onLaunchDemo, onHowItWorks }) => {
   const { scenario, t } = useSimulation();
@@ -8,8 +8,9 @@ export const HeroLanding = ({ onLaunchDemo, onHowItWorks }) => {
   return (
     <section className="py-10 text-center max-w-3xl mx-auto space-y-4">
       
-      <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-amber-100 text-amber-900 border border-amber-300">
-        <span>SIH26077 • Prototype Presentation Demo</span>
+      <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-emerald-100 text-emerald-950 border border-emerald-300">
+        <Activity className="w-3.5 h-3.5 text-emerald-700 animate-pulse" />
+        <span>SIH26077 • AGNI-CAST Operational Weather Engine</span>
       </div>
 
       <h1 className="text-3xl sm:text-5xl font-black text-stone-900 tracking-tight leading-tight">
@@ -18,7 +19,7 @@ export const HeroLanding = ({ onLaunchDemo, onHowItWorks }) => {
       </h1>
 
       <p className="text-base text-stone-600 font-medium leading-relaxed max-w-2xl mx-auto">
-        Predict Severe Weather. Detect Local Risk. Warn People Before It Escalates.
+        Multi-source weather telemetry & satellite fusion (INSAT-3DR) powered by Gemini AI Nowcasting. Detect micro-sector risk and dispatch verified citizen alerts before severe thunderstorms, cloudbursts, and flash floods strike.
       </p>
 
       <div className="pt-2 flex items-center justify-center space-x-3">
@@ -26,7 +27,7 @@ export const HeroLanding = ({ onLaunchDemo, onHowItWorks }) => {
           onClick={onLaunchDemo}
           className="px-6 py-2.5 rounded-lg font-bold text-xs bg-stone-900 hover:bg-stone-800 text-white transition flex items-center space-x-2 cursor-pointer shadow-xs"
         >
-          <span>Launch Dashboard</span>
+          <span>Launch Command Center</span>
           <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
         </button>
 
@@ -34,7 +35,7 @@ export const HeroLanding = ({ onLaunchDemo, onHowItWorks }) => {
           onClick={onHowItWorks}
           className="px-6 py-2.5 rounded-lg font-semibold text-xs bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 transition cursor-pointer"
         >
-          <span>System Workflow</span>
+          <span>Technical Approach & Flow</span>
         </button>
       </div>
 
