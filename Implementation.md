@@ -54,12 +54,18 @@ Traditional weather forecasting relies on broad, district-level bulletins issued
 
 ## 🛠️ Technology Stack & Architecture
 
-### 1. Primary Satellite & Data Architecture
-* **Primary Satellite Stream**: **INSAT-3DR** *(ISRO Hydro-Meteorological Imager & Sounder telemetry for convection & cloudburst tracking)*
-* **Weather Telemetry APIs**: Open-Meteo API & OpenWeatherMap Stream
+### 1. Integrated Multi-API Data Architecture
+1. **INSAT-3DR Satellite Stream API** *(ISRO MOSDAC Multispectral Feed - WV 6.5-7.0 µm, TIR-1 10.2-11.2 µm, TIR-2 11.5-12.5 µm, MIR 3.8-4.0 µm)*
+2. **Open-Meteo Weather API** *(Real-Time Ground Telemetry - Temperature, Humidity, Precipitation Rate, Wind Speed, Pressure)*
+3. **IMDAA Reanalysis API** *(NCMRWF NCUM-R 12km High-Resolution Atmospheric Instability Baselines - CAPE, CIN, PWAT)*
+4. **CartoDEM / SRTM 30m Elevation API** *(ISRO Bhuvan & USGS 30m Digital Elevation Models for micro-basin runoff calculation)*
+5. **Google Maps / Spatial GIS API** *(Vector maps, sector polygon boundaries, geocoding, and evacuation route rendering)*
+6. **Google Gemini 2.0 Flash AI API** *(Zero-Shot Meteorological Inference & Multilingual Advisory Generation)*
+7. **NDMA CAP v1.2 Cell Broadcast API** *(Common Alerting Protocol geo-fenced cell broadcast emergency dispatch)*
+
 * **RAG Architecture Type**: **Multimodal HyDE Graph RAG** *(Hybrid Dense-Sparse Vector Retrieval + Hypothetical Document Embeddings + SOP Knowledge Graph)*
 * **Vector Database**: pgvector / ChromaDB *(Embeddings index for ISRO disaster SOP manuals, flood response guidelines, and drainage protocols)*
-* **Relational Database**: PostgreSQL / SQLite *(Real-time weather logs, risk vectors, sent alerts, and sector registries)*
+* **Relational Database**: PostgreSQL / SQLite *(Centralized real-time weather logs, risk vectors, sent alerts, and sector registries)*
 
 ### 2. Frontend & Presentation Deck (Web Command Center for Admin)
 * **Framework**: React 19 + Vite 8

@@ -37,36 +37,55 @@ export const SystemArchitecture = () => {
         <div className="bg-sky-50/70 border-2 border-sky-300 rounded-xl p-4 flex flex-col justify-between space-y-4">
           <div className="text-center border-b border-sky-300 pb-2">
             <div className="text-xs font-black uppercase text-sky-800 tracking-wider font-mono">STEP 1</div>
-            <div className="text-sm font-bold text-sky-950">INSAT-3DR Satellite & Weather APIs</div>
+            <div className="text-sm font-bold text-sky-950">Integrated Multi-API Telemetry Pipeline</div>
           </div>
 
           <div className="space-y-3 flex-1 flex flex-col justify-between">
             <div className="bg-blue-100/90 border-2 border-blue-500 rounded-xl p-3 space-y-1 shadow-sm">
               <div className="font-extrabold text-xs text-blue-950 flex items-center justify-between">
-                <span>PRIMARY: INSAT-3DR Satellite</span>
-                <span className="text-[9px] bg-blue-700 text-white px-1.5 py-0.5 rounded font-mono font-bold">ISRO STREAM</span>
+                <span>1. INSAT-3DR Satellite Stream API</span>
+                <span className="text-[9px] bg-blue-700 text-white px-1.5 py-0.5 rounded font-mono font-bold">ISRO MOSDAC</span>
               </div>
               <p className="text-[10px] text-blue-950 font-semibold leading-tight">
-                WV (6.5–7.0µm), TIR-1 (10.2–11.2µm), TIR-2 (11.5–12.5µm) & MIR (3.8–4.0µm) bands for cloud top & moisture monitoring.
+                WV (6.5–7.0µm), TIR-1 (10.2–11.2µm), TIR-2 (11.5–12.5µm) & MIR (3.8–4.0µm) multispectral bands for cloud top & moisture monitoring.
               </p>
             </div>
 
-            <div className="bg-white border-2 border-sky-300 rounded-xl p-3 space-y-1 shadow-2xs">
-              <div className="font-extrabold text-xs text-sky-950 flex items-center justify-between">
-                <span>Open-Meteo & IMDAA Data</span>
-                <span className="text-[9px] bg-sky-100 text-sky-800 px-1.5 py-0.5 rounded font-mono">Live Stream</span>
+            <div className="bg-white border-2 border-emerald-300 rounded-xl p-2.5 space-y-1 shadow-2xs">
+              <div className="font-extrabold text-xs text-emerald-950 flex items-center justify-between">
+                <span>2. Open-Meteo Weather API</span>
+                <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono">Live Telemetry</span>
               </div>
-              <p className="text-[10px] text-stone-600">Temp, RH, CAPE, CIN, Wind Shear & GSMaP-ISRO Rainfall</p>
+              <p className="text-[10px] text-stone-600">Temp, Relative Humidity, Precipitation Rate, Surface Pressure, Wind Velocity.</p>
             </div>
 
-            <div className="bg-white border-2 border-sky-300 rounded-xl p-3 space-y-1 shadow-2xs">
-              <div className="font-extrabold text-xs text-sky-950">CartoDEM / SRTM Elevation</div>
-              <p className="text-[10px] text-stone-600">Low-lying drainage basin elevation grid for Flash Flood mapping</p>
+            <div className="bg-white border-2 border-purple-300 rounded-xl p-2.5 space-y-1 shadow-2xs">
+              <div className="font-extrabold text-xs text-purple-950 flex items-center justify-between">
+                <span>3. IMDAA Reanalysis API</span>
+                <span className="text-[9px] bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded font-mono">NCUM-R Grid</span>
+              </div>
+              <p className="text-[10px] text-stone-600">CAPE, CIN, Precipitable Water (PWAT), Atmospheric Instability Baselines.</p>
+            </div>
+
+            <div className="bg-white border-2 border-amber-300 rounded-xl p-2.5 space-y-1 shadow-2xs">
+              <div className="font-extrabold text-xs text-amber-950 flex items-center justify-between">
+                <span>4. CartoDEM / SRTM 30m Terrain API</span>
+                <span className="text-[9px] bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded font-mono">ISRO Bhuvan</span>
+              </div>
+              <p className="text-[10px] text-stone-600">30m digital elevation grid for low-lying runoff micro-basin calculation.</p>
+            </div>
+
+            <div className="bg-white border-2 border-rose-300 rounded-xl p-2.5 space-y-1 shadow-2xs">
+              <div className="font-extrabold text-xs text-rose-950 flex items-center justify-between">
+                <span>5. Google Maps / GIS Tile API</span>
+                <span className="text-[9px] bg-rose-100 text-rose-900 px-1.5 py-0.5 rounded font-mono">Spatial Grid</span>
+              </div>
+              <p className="text-[10px] text-stone-600">Vector sector bounding polygons & evacuation route rendering.</p>
             </div>
           </div>
 
           <div className="bg-sky-100 border border-sky-300 p-2 rounded-lg text-center text-[10px] font-mono font-bold text-sky-950">
-            ──► Streams Data to Gemini AI Engine
+            ──► Streams Fusion Data to Gemini AI Engine
           </div>
         </div>
 
@@ -80,11 +99,11 @@ export const SystemArchitecture = () => {
           <div className="space-y-3 flex-1 flex flex-col justify-between">
             <div className="bg-purple-100 border-2 border-purple-500 rounded-xl p-3 space-y-1.5 shadow-sm">
               <div className="font-black text-xs text-purple-950 flex items-center justify-between">
-                <span>Google Gemini API Key</span>
+                <span>6. Google Gemini 2.0 Flash AI API</span>
                 <span className="text-[9px] bg-purple-700 text-white px-1.5 py-0.5 rounded font-mono font-bold">GEMINI AI</span>
               </div>
               <p className="text-[10px] text-purple-950 font-semibold leading-tight">
-                Replaces custom model training with zero-shot Gemini 1.5/2.0 Flash reasoning over INSAT-3DR telemetry.
+                Replaces custom model training with zero-shot Gemini 2.0 Flash reasoning over INSAT-3DR telemetry.
               </p>
               <div className="text-[9px] text-purple-900 font-mono pt-0.5">
                 Generates 15-90 min nowcasts & 0-100 risk scores.
@@ -92,13 +111,13 @@ export const SystemArchitecture = () => {
             </div>
 
             <div className="bg-teal-50 border border-teal-400 rounded-xl p-2.5 space-y-1 shadow-2xs">
-              <div className="font-extrabold text-xs text-teal-950">Multimodal RAG SOP Index</div>
+              <div className="font-extrabold text-xs text-teal-950">Multimodal HyDE Graph RAG</div>
               <p className="text-[9px] text-teal-900">Retrieves ISRO flood manuals & municipal disaster guidelines</p>
             </div>
 
             <div className="bg-white border-2 border-purple-400 rounded-xl p-2.5 text-center space-y-1 shadow-2xs">
               <div className="font-black text-xs text-purple-950">PostgreSQL / SQLite DB</div>
-              <p className="text-[9px] text-stone-600 font-mono">Stores Real-Time Values & Gemini Forecast Logs</p>
+              <p className="text-[9px] text-stone-600 font-mono font-bold">Centralized Data Stream Hub</p>
             </div>
           </div>
 
@@ -116,7 +135,7 @@ export const SystemArchitecture = () => {
 
           <div className="space-y-3 flex-1 flex flex-col justify-between">
             <div className="bg-white border-2 border-amber-300 rounded-xl p-3 space-y-1 shadow-2xs">
-              <div className="font-extrabold text-xs text-amber-950">Real-Time Dashboard & Leaflet Map</div>
+              <div className="font-extrabold text-xs text-amber-950">Real-Time Dashboard & GIS Maps</div>
               <p className="text-[10px] text-stone-600">Displays Sector Risk Circles (🟢 SAFE → 🟣 EXTREME Cloudburst)</p>
             </div>
 
@@ -152,17 +171,17 @@ export const SystemArchitecture = () => {
         <div className="bg-emerald-50/70 border-2 border-emerald-300 rounded-xl p-4 flex flex-col justify-between space-y-4">
           <div className="text-center border-b border-emerald-300 pb-2">
             <div className="text-xs font-black uppercase text-emerald-800 tracking-wider font-mono">STEP 6</div>
-            <div className="text-sm font-bold text-emerald-950">Citizen Android App & Shelters</div>
+            <div className="text-sm font-bold text-emerald-950">Citizen App & Emergency Broadcast</div>
           </div>
 
           <div className="space-y-3 flex-1 flex flex-col justify-between">
             <div className="bg-white border-2 border-emerald-400 rounded-xl p-3 space-y-1 shadow-2xs">
               <div className="font-extrabold text-xs text-emerald-950 flex items-center justify-between">
-                <span>Cell Broadcast Alert</span>
-                <span className="text-[9px] bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded font-mono font-bold">MOBILE APP</span>
+                <span>7. NDMA CAP v1.2 Cell Broadcast API</span>
+                <span className="text-[9px] bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded font-mono font-bold">CAP v1.2</span>
               </div>
-              <p className="text-[10px] text-stone-700">
-                Instant Push Notification in English, Marathi (मराठी), and Hindi (हिंदी).
+              <p className="text-[10px] text-stone-700 font-semibold">
+                Geo-fenced mobile alert dispatch in English, Marathi (मराठी), and Hindi (हिंदी).
               </p>
             </div>
 

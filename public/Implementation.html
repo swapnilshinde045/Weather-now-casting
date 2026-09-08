@@ -83,52 +83,42 @@
     <!-- Architecture ASCII Diagram Box -->
     <section class="space-y-3">
       <h2 class="text-xl font-bold text-stone-900 border-b border-stone-200 pb-2">
-        🏛️ End-to-End System Architecture Pipeline
+        🏛️ Integrated Multi-API Architecture Pipeline
       </h2>
 
       <div class="bg-stone-900 text-amber-100 rounded-xl p-5 font-mono text-xs overflow-x-auto shadow-inner space-y-2">
         <pre>
 ┌──────────────────────────────────────────────────────────────────────────┐
-│              External Meteorological Data Streams (0 Hardware)           │
-│  • Open-Meteo Weather API (Temp, Humidity, Rain Rate, Wind Speed)        │
-│  • OpenWeatherMap & Atmospheric Stability Pressure Stream                │
-│  • IMD Doppler Weather Radar Grid API & Satellite Cloud Reflectivity     │
+│              STEP 1: Multi-Source Satellite & Telemetry Data Streams     │
+│  1. INSAT-3DR Satellite Stream API (ISRO MOSDAC WV, TIR-1, TIR-2, MIR)  │
+│  2. Open-Meteo Weather API (Temp, Humidity, Rain Rate, Wind Velocity)   │
+│  3. IMDAA High-Resolution Reanalysis API (NCUM-R 12km Instability Grid)  │
+│  4. CartoDEM / SRTM 30m Elevation API (ISRO Bhuvan & USGS 30m Grid)      │
+│  5. Google Maps GIS API (Vector Sector Polygons & Evacuation Routes)     │
 └────────────────────────────────────┬─────────────────────────────────────┘
                                      │ (JSON Stream over REST / HTTP)
                                      ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
-│                Backend Data Ingestion & Preprocessor Pipeline             │
-│  • REST API Ingestion Client & Data Normalizer Engine                    │
-│  • Grid Coordinate Spatial Resolution (OpenStreetMap Geocoding)          │
+│             STEP 2 & 3: Gemini 2.0 AI Engine & HyDE Graph RAG            │
+│  6. Google Gemini 2.0 Flash AI API (Zero-Shot Weather Nowcasting Core)    │
+│  • Multimodal HyDE Graph RAG Index (Vector SOP Index + pgvector)         │
+│  • PostgreSQL Centralized DB (Real-Time Forecasts & Telemetry Logs)      │
 └────────────────────────────────────┬─────────────────────────────────────┘
-                                     │
+                                     │ (Streams Real-Time Values)
                                      ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
-│                 Cloud Infrastructure & Persistence Layer                 │
-│  • PostgreSQL Database (Telemetry History Logs, Sent Alerts, Sectors)    │
-│  • Vector Database / RAG Index (Historical Flood Guidelines, SOPs)       │
-└────────────────────────────────────┬─────────────────────────────────────┘
-                                     │
-                                     ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│                  AI Nowcasting & Risk Core Engine                        │
-│  • Spatial-Temporal ConvLSTM + Transformer Forecast Model (15–90 Min)     │
-│  • Multi-Factor Risk Assessment Engine (0–100 Rating Score)             │
-│  • CAP v1.2 Protocol Alert Generator                                     │
-└────────────────────────────────────┬─────────────────────────────────────┘
-                                     │
-                                     ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│               WEBSITE FOR ADMIN (React Web Command Dashboard)            │
-│  • Leaflet Geospatial Sector Risk Map & Recharts 90-Min Forecast         │
-│  • Admin Review & Control Panel (Human-in-the-Loop Approval & Editing)   │
+│              STEP 4 & 5: Admin Web Portal & Human Approval Loop          │
+│  • Real-Time Dashboard & GIS Maps (🟢 SAFE → 🟣 CLOUDBURST FLOOD)        │
+│  • Severe Threat Target Focus: Thunderstorms, Cloudbursts & Flash Floods  │
+│  • Human-in-the-Loop Approval: Admin reviews advisory & dispatches       │
 └────────────────────────────────────┬─────────────────────────────────────┘
                                      │ (Dispatches Approved Bulletin)
                                      ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
-│               ANDROID APP FOR USERS (Citizen Mobile Application)         │
-│  • Multilingual Push Advisories (English • मराठी Marathi • हिंदी Hindi) │
-│  • Evacuation Routes & Concrete High-Ground Shelter Finder               │
+│         STEP 6: Citizen Android App & Safe Evacuation Shelters           │
+│  7. NDMA CAP v1.2 Cell Broadcast API (Geo-Fenced Mobile Push Alerts)    │
+│  • Multilingual Alerts (English • मराठी Marathi • हिंदी Hindi)           │
+│  • GPS Evacuation Finder: Directs to high-ground concrete shelters!      │
 └──────────────────────────────────────────────────────────────────────────┘
         </pre>
       </div>
@@ -137,29 +127,31 @@
     <!-- Technology Stack -->
     <section class="space-y-4">
       <h2 class="text-xl font-bold text-stone-900 border-b border-stone-200 pb-2">
-        🛠️ Technology Stack & Architecture
+        🛠️ Technology Stack & API Ecosystem
       </h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="bg-amber-50/60 border border-amber-200 rounded-xl p-4 space-y-2">
-          <h3 class="text-xs font-bold font-mono text-amber-950 uppercase">1. WEBSITE FOR ADMIN (React Web Portal)</h3>
+          <h3 class="text-xs font-bold font-mono text-amber-950 uppercase">1. Integrated Telemetry & AI APIs</h3>
           <ul class="text-xs text-stone-700 space-y-1 list-disc pl-4 font-mono">
-            <li>React 19 + Vite 8</li>
-            <li>Tailwind CSS v4 (Minimalist Cream Theme `#faf7f2`)</li>
-            <li>Leaflet + CartoDB Voyager light tiles</li>
-            <li>Recharts Data Visualization</li>
-            <li>Web Audio API Emergency Siren Synthesizer</li>
+            <li>1. INSAT-3DR Satellite Stream API (ISRO)</li>
+            <li>2. Open-Meteo Real-Time Weather API</li>
+            <li>3. IMDAA High-Resolution Reanalysis API</li>
+            <li>4. CartoDEM / SRTM 30m Elevation API</li>
+            <li>5. Google Maps / CartoDB GIS API</li>
+            <li>6. Google Gemini 2.0 Flash AI API</li>
+            <li>7. NDMA CAP v1.2 Cell Broadcast API</li>
           </ul>
         </div>
 
         <div class="bg-sky-50/60 border border-sky-200 rounded-xl p-4 space-y-2">
-          <h3 class="text-xs font-bold font-mono text-sky-950 uppercase">2. Backend & Android User App</h3>
+          <h3 class="text-xs font-bold font-mono text-sky-950 uppercase">2. Command Portal & Citizen App</h3>
           <ul class="text-xs text-stone-700 space-y-1 list-disc pl-4 font-mono">
-            <li>Open-Meteo Weather API & OpenWeatherMap</li>
+            <li>React 19 + Vite 8 Web Command Portal</li>
+            <li>Tailwind CSS v4 (Minimalist Classic Cream Theme `#faf7f2`)</li>
+            <li>Leaflet Geospatial Polygon Sector Overlays</li>
             <li>PostgreSQL Relational DB & pgvector RAG Index</li>
-            <li>CAP v1.2 Protocol Alert Payload</li>
-            <li>Android App Cell Broadcast Push Notifications</li>
-            <li>Multilingual Support (EN, Marathi मराठी, Hindi हिंदी)</li>
+            <li>Multilingual i18n Engine (EN, Marathi मराठी, Hindi हिंदी)</li>
           </ul>
         </div>
       </div>
