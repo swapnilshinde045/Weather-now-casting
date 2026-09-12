@@ -1,118 +1,190 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSimulation } from '../context/SimulationContext';
 import { SCENARIOS } from '../data/demoWeatherData';
-import { ShieldAlert, Sun, CloudRain, CloudLightning, Zap, Tv } from 'lucide-react';
+import { ShieldAlert, Sun, CloudRain, CloudLightning, Zap, Tv, Menu, X, Satellite, Bot, Globe } from 'lucide-react';
+import { Button } from './ui/saa-s-template';
 
 export const Navbar = ({ activeTab, setActiveTab }) => {
   const { 
     scenario, 
     setScenario, 
     isPresentationMode, 
-    togglePresentationMode,
-    language,
-    setLanguage
+    togglePresentationMode
   } = useSimulation();
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleNavClick = (tab) => {
+    setActiveTab(tab);
+    setMobileMenuOpen(false);
+  };
+
   return (
-    <header className="bg-white border-b border-stone-200 sticky top-0 z-40 text-stone-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <header className="fixed top-0 w-full z-50 border-b border-zinc-800/80 bg-zinc-950/85 backdrop-blur-md text-white">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5">
+        <div className="flex items-center justify-between">
           
           {/* Logo */}
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('hero')}>
-            <div className="w-9 h-9 rounded-lg bg-stone-900 flex items-center justify-center text-amber-400 font-bold">
-              <ShieldAlert className="w-5 h-5 text-amber-400" />
+          <div 
+            className="flex items-center space-x-2.5 cursor-pointer group" 
+            onClick={() => handleNavClick('hero')}
+          >
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-rose-600 flex items-center justify-center text-black font-black shadow-md shadow-amber-500/20 group-hover:scale-105 transition">
+              <ShieldAlert className="w-4 h-4 text-black" />
             </div>
             <div>
-              <span className="font-black text-lg text-stone-900 tracking-tight">
+              <span className="font-bold text-base text-white tracking-tight flex items-center gap-1.5">
                 AGNI-CAST
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               </span>
-              <span className="ml-2 text-xs font-mono font-bold text-stone-500">
-                SIH26077
+              <span className="text-[10px] font-mono text-zinc-400 block -mt-0.5">
+                SIH26077 • OPERATIONAL
               </span>
             </div>
           </div>
 
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-semibold text-stone-600">
+          {/* Center Navigation Links (Desktop) */}
+          <div className="hidden lg:flex items-center justify-center gap-6 font-medium text-xs">
             <button
-              onClick={() => setActiveTab('dashboard')}
-              className={`transition ${activeTab === 'dashboard' ? 'text-amber-800 font-bold border-b-2 border-amber-800 pb-1' : 'hover:text-stone-900'}`}
+              onClick={() => handleNavClick('dashboard')}
+              className={`transition-colors py-1 cursor-pointer ${activeTab === 'dashboard' ? 'text-white font-bold border-b-2 border-amber-400' : 'text-zinc-400 hover:text-white'}`}
             >
               Dashboard
             </button>
             <button
-              onClick={() => setActiveTab('map')}
-              className={`transition ${activeTab === 'map' ? 'text-amber-800 font-bold border-b-2 border-amber-800 pb-1' : 'hover:text-stone-900'}`}
+              onClick={() => handleNavClick('map')}
+              className={`transition-colors py-1 cursor-pointer ${activeTab === 'map' ? 'text-white font-bold border-b-2 border-amber-400' : 'text-zinc-400 hover:text-white'}`}
             >
-              Geospatial Map
+              GIS Sector Map
             </button>
             <button
-              onClick={() => setActiveTab('nowcasting')}
-              className={`transition ${activeTab === 'nowcasting' ? 'text-amber-800 font-bold border-b-2 border-amber-800 pb-1' : 'hover:text-stone-900'}`}
+              onClick={() => handleNavClick('nowcasting')}
+              className={`transition-colors py-1 cursor-pointer ${activeTab === 'nowcasting' ? 'text-white font-bold border-b-2 border-amber-400' : 'text-zinc-400 hover:text-white'}`}
             >
               AI Nowcasting
             </button>
             <button
-              onClick={() => setActiveTab('warning-system')}
-              className={`transition ${activeTab === 'warning-system' ? 'text-amber-800 font-bold border-b-2 border-amber-800 pb-1' : 'hover:text-stone-900'}`}
+              onClick={() => handleNavClick('warning-system')}
+              className={`transition-colors py-1 cursor-pointer ${activeTab === 'warning-system' ? 'text-white font-bold border-b-2 border-amber-400' : 'text-zinc-400 hover:text-white'}`}
             >
               Early Warning
             </button>
             <button
-              onClick={() => setActiveTab('admin-panel')}
-              className={`transition ${activeTab === 'admin-panel' ? 'text-amber-800 font-bold border-b-2 border-amber-800 pb-1' : 'hover:text-stone-900'}`}
+              onClick={() => handleNavClick('admin-panel')}
+              className={`transition-colors py-1 cursor-pointer ${activeTab === 'admin-panel' ? 'text-amber-400 font-bold border-b-2 border-amber-400' : 'text-zinc-400 hover:text-white'}`}
             >
               Admin Control
             </button>
             <button
-              onClick={() => setActiveTab('architecture')}
-              className={`transition ${activeTab === 'architecture' ? 'text-amber-800 font-bold border-b-2 border-amber-800 pb-1' : 'hover:text-stone-900'}`}
+              onClick={() => handleNavClick('architecture')}
+              className={`transition-colors py-1 cursor-pointer ${activeTab === 'architecture' ? 'text-white font-bold border-b-2 border-amber-400' : 'text-zinc-400 hover:text-white'}`}
             >
-              Workflow Flowchart
-            </button>
-          </nav>
-
-          {/* Scenario Trigger Pills right in Header */}
-          <div className="flex items-center space-x-2">
-            <div className="hidden sm:flex items-center space-x-1 bg-stone-100 p-1 rounded-lg border border-stone-200 text-xs">
-              <button
-                onClick={() => setScenario(SCENARIOS.NORMAL)}
-                className={`px-2.5 py-1 rounded font-bold transition ${scenario === SCENARIOS.NORMAL ? 'bg-emerald-700 text-white' : 'text-stone-600 hover:text-stone-900'}`}
-              >
-                Normal
-              </button>
-              <button
-                onClick={() => setScenario(SCENARIOS.MODERATE_RAIN)}
-                className={`px-2.5 py-1 rounded font-bold transition ${scenario === SCENARIOS.MODERATE_RAIN ? 'bg-amber-600 text-white' : 'text-stone-600 hover:text-stone-900'}`}
-              >
-                Rain
-              </button>
-              <button
-                onClick={() => setScenario(SCENARIOS.HEAVY_RAIN)}
-                className={`px-2.5 py-1 rounded font-bold transition ${scenario === SCENARIOS.HEAVY_RAIN ? 'bg-rose-600 text-white' : 'text-stone-600 hover:text-stone-900'}`}
-              >
-                Heavy
-              </button>
-              <button
-                onClick={() => setScenario(SCENARIOS.SEVERE_WEATHER)}
-                className={`px-2.5 py-1 rounded font-bold transition ${scenario === SCENARIOS.SEVERE_WEATHER ? 'bg-purple-700 text-white' : 'text-stone-600 hover:text-stone-900'}`}
-              >
-                Severe
-              </button>
-            </div>
-
-            <button
-              onClick={togglePresentationMode}
-              className={`p-2 rounded-lg text-xs font-bold transition ${isPresentationMode ? 'bg-purple-800 text-white' : 'bg-stone-900 text-amber-100 hover:bg-stone-800'}`}
-              title="Toggle Presentation Mode"
-            >
-              <Tv className="w-4 h-4 text-amber-400" />
+              Architecture
             </button>
           </div>
 
+          {/* Right Action & Scenario Buttons */}
+          <div className="hidden md:flex items-center space-x-3">
+            
+            {/* Presentation Mode Toggle */}
+            <button
+              onClick={togglePresentationMode}
+              className={`p-2 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer border ${
+                isPresentationMode 
+                  ? 'bg-purple-600 text-white border-purple-500 shadow-md shadow-purple-500/20' 
+                  : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800'
+              }`}
+              title="Toggle Presentation Tour Mode for SIH Judges"
+            >
+              <Tv className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden xl:inline text-[11px]">Tour Mode</span>
+            </button>
+
+            {/* Launch Command Center Button */}
+            <Button
+              type="button"
+              variant="gradient"
+              size="sm"
+              onClick={() => handleNavClick('dashboard')}
+              className="rounded-lg font-semibold text-xs text-black cursor-pointer shadow-md shadow-white/10"
+            >
+              Command Center
+            </Button>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            type="button"
+            className="lg:hidden text-zinc-300 hover:text-white p-1"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle mobile menu"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
-      </div>
+      </nav>
+
+      {/* Mobile Menu Dropdown */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-zinc-950/95 backdrop-blur-md border-t border-zinc-800 animate-[slideDown_0.2s_ease-out]">
+          <div className="px-6 py-4 flex flex-col gap-3 font-mono text-xs">
+            <button
+              onClick={() => handleNavClick('hero')}
+              className={`text-left py-2 border-b border-zinc-900 ${activeTab === 'hero' ? 'text-amber-400 font-bold' : 'text-zinc-300'}`}
+            >
+              🏠 Home & Overview
+            </button>
+            <button
+              onClick={() => handleNavClick('dashboard')}
+              className={`text-left py-2 border-b border-zinc-900 ${activeTab === 'dashboard' ? 'text-amber-400 font-bold' : 'text-zinc-300'}`}
+            >
+              🌐 Live Dashboard
+            </button>
+            <button
+              onClick={() => handleNavClick('map')}
+              className={`text-left py-2 border-b border-zinc-900 ${activeTab === 'map' ? 'text-amber-400 font-bold' : 'text-zinc-300'}`}
+            >
+              🗺️ GIS Sector Map
+            </button>
+            <button
+              onClick={() => handleNavClick('nowcasting')}
+              className={`text-left py-2 border-b border-zinc-900 ${activeTab === 'nowcasting' ? 'text-amber-400 font-bold' : 'text-zinc-300'}`}
+            >
+              ⚡ AI Nowcasting Engine
+            </button>
+            <button
+              onClick={() => handleNavClick('warning-system')}
+              className={`text-left py-2 border-b border-zinc-900 ${activeTab === 'warning-system' ? 'text-amber-400 font-bold' : 'text-zinc-300'}`}
+            >
+              ⚠️ Early Warning System
+            </button>
+            <button
+              onClick={() => handleNavClick('admin-panel')}
+              className={`text-left py-2 border-b border-zinc-900 ${activeTab === 'admin-panel' ? 'text-amber-400 font-bold' : 'text-zinc-300'}`}
+            >
+              🎛️ Admin Control Panel
+            </button>
+            <button
+              onClick={() => handleNavClick('architecture')}
+              className={`text-left py-2 border-b border-zinc-900 ${activeTab === 'architecture' ? 'text-amber-400 font-bold' : 'text-zinc-300'}`}
+            >
+              🏛️ System Architecture Flowchart
+            </button>
+
+            <div className="pt-2 flex flex-col gap-2">
+              <Button
+                type="button"
+                variant="gradient"
+                size="sm"
+                onClick={() => handleNavClick('dashboard')}
+                className="w-full text-black font-bold"
+              >
+                Launch Command Center
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

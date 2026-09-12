@@ -88,7 +88,7 @@ export const HyperLocalMap = () => {
             <MapRecenter center={selectedLoc.coordinates} />
             <TileLayer
               attribution='&copy; OpenStreetMap &copy; CARTO'
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
             {DEMO_LOCATIONS.map((loc) => {

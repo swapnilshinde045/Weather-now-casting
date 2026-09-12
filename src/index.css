@@ -1,11 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
 @layer base {
   body {
-    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
-    background-color: #faf7f2; /* Creamy Warm Background */
-    color: #1c1917; /* Stone 900 Text */
+    font-family: 'Poppins', 'Plus Jakarta Sans', system-ui, sans-serif;
+    background-color: #09090b;
+    color: #f4f4f5;
+    overflow-x: hidden;
   }
 }
 
@@ -15,17 +17,39 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f5f0e6;
+  background: #09090b;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d6cebe;
+  background: #27272a;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #b8ad96;
+  background: #3f3f46;
 }
 
-/* Radar & Pulse Animations */
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes radar-pulse {
   0% {
     transform: scale(0.95);
@@ -45,40 +69,40 @@
   animation: radar-pulse 3s infinite ease-in-out;
 }
 
-@keyframes alert-glow-light {
+@keyframes alert-glow {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(225, 29, 72, 0.25);
+    box-shadow: 0 0 20px rgba(244, 63, 94, 0.3);
   }
   50% {
-    box-shadow: 0 0 30px rgba(225, 29, 72, 0.45);
+    box-shadow: 0 0 35px rgba(244, 63, 94, 0.6);
   }
 }
 
 .animate-alert-glow {
-  animation: alert-glow-light 2s infinite ease-in-out;
+  animation: alert-glow 2s infinite ease-in-out;
 }
 
-/* Leaflet Light Creamy Theme Adjustments */
+/* Leaflet Dark Map Theme Adjustments */
 .leaflet-container {
   width: 100%;
   height: 100%;
-  background: #f4efe6 !important;
+  background: #18181b !important;
   border-radius: 0.75rem;
 }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-  background: #ffffff !important;
-  color: #1c1917 !important;
-  border: 1px solid #e7e0d3;
-  box-shadow: 0 10px 25px -5px rgba(28, 25, 23, 0.15);
+  background: #18181b !important;
+  color: #f4f4f5 !important;
+  border: 1px solid #27272a;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
 }
 .leaflet-container a.leaflet-popup-close-button {
-  color: #78716c !important;
+  color: #a1a1aa !important;
 }
 
-/* Custom Minimalist Classic Glass Panel */
-.glass-panel-light {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(231, 224, 211, 0.8);
+/* Glassmorphism Dark Panel */
+.glass-panel-dark {
+  background: rgba(18, 18, 20, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
