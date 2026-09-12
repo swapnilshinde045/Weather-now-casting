@@ -13,7 +13,7 @@ export const LiveDashboard = () => {
   } = useSimulation();
 
   return (
-    <section className="bg-white border-2 border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+    <section className="bg-white border-2 border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 section-pop-hover">
       
       {/* Section Header with Ref Image Style Badge */}
       <div className="text-center space-y-2 max-w-3xl mx-auto border-b border-stone-200 pb-6">
@@ -56,42 +56,42 @@ export const LiveDashboard = () => {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         
         {/* 1. Location */}
-        <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 space-y-1 shadow-2xs">
+        <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 space-y-1 shadow-2xs card-pop-hover">
           <span className="text-[10px] font-mono text-stone-400 block font-bold">SECTOR</span>
           <div className="text-sm font-bold text-stone-900 truncate">📍 {currentLocation?.shortName || currentLocation?.name || 'Sector'}</div>
           <div className="text-[10px] text-stone-500 truncate">{currentLocation?.category || 'Monitored Zone'}</div>
         </div>
 
         {/* 2. Temperature */}
-        <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 space-y-1 shadow-2xs">
+        <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 space-y-1 shadow-2xs card-pop-hover">
           <span className="text-[10px] font-mono text-stone-400 block font-bold">TEMPERATURE</span>
           <div className="text-xl font-black text-stone-900">{currentWeather?.temp ?? '31.2'} °C</div>
           <div className="text-[10px] text-stone-500">Thermal Index</div>
         </div>
 
         {/* 3. Humidity */}
-        <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 space-y-1 shadow-2xs">
+        <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 space-y-1 shadow-2xs card-pop-hover">
           <span className="text-[10px] font-mono text-stone-400 block font-bold">HUMIDITY</span>
           <div className="text-xl font-black text-stone-900">{currentWeather?.humidity ?? '48'} %</div>
           <div className="text-[10px] text-stone-500">Relative Saturation</div>
         </div>
 
         {/* 4. Rainfall */}
-        <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 space-y-1 shadow-2xs">
+        <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 space-y-1 shadow-2xs card-pop-hover">
           <span className="text-[10px] font-mono text-stone-400 block font-bold">RAINFALL</span>
           <div className="text-xl font-black text-stone-900">{currentWeather?.rainfall ?? '0.2'} <span className="text-xs text-stone-500">mm/h</span></div>
           <div className="text-[10px] text-stone-500">Precipitation Rate</div>
         </div>
 
         {/* 5. Wind */}
-        <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 space-y-1 shadow-2xs">
+        <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 space-y-1 shadow-2xs card-pop-hover">
           <span className="text-[10px] font-mono text-stone-400 block font-bold">WIND VELOCITY</span>
           <div className="text-xl font-black text-stone-900">{currentWeather?.windSpeed ?? '12'} <span className="text-xs text-stone-500">km/h</span></div>
           <div className="text-[10px] text-stone-500">Vector {currentWeather?.windDirection ?? 'SW'}</div>
         </div>
 
         {/* 6. Risk Level */}
-        <div className={`border rounded-2xl p-4 space-y-1 shadow-2xs ${
+        <div className={`border rounded-2xl p-4 space-y-1 shadow-2xs card-pop-hover ${
           currentWeather?.riskLevel === 'EXTREME' ? 'bg-purple-50 border-purple-300 text-purple-900' :
           currentWeather?.riskLevel === 'HIGH' ? 'bg-rose-50 border-rose-300 text-rose-900' :
           currentWeather?.riskLevel === 'MODERATE' ? 'bg-amber-50 border-amber-300 text-amber-900' :

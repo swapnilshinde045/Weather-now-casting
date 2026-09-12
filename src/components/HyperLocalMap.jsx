@@ -107,7 +107,7 @@ export const HyperLocalMap = () => {
   };
 
   return (
-    <section className="bg-white border-2 border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+    <section className="bg-white border-2 border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 section-pop-hover">
       
       {/* Section Header with Ref Image Style Badge */}
       <div className="text-center space-y-2 max-w-3xl mx-auto border-b border-stone-200 pb-6">

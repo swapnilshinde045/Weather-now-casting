@@ -13,7 +13,7 @@ export const EarlyWarningSystem = () => {
   const isSevere = scenario === 'HEAVY_RAIN' || scenario === 'SEVERE_WEATHER';
 
   return (
-    <div className={`rounded-xl p-5 border space-y-4 shadow-xs transition ${
+    <div className={`rounded-xl p-5 border space-y-4 shadow-xs section-pop-hover ${
       scenario === 'SEVERE_WEATHER' 
         ? 'bg-purple-50 border-purple-300 text-purple-950' 
         : scenario === 'HEAVY_RAIN' 
