@@ -123,6 +123,99 @@ export async function fetchLiveOpenMeteoData(lat = 19.8398, lng = 75.2285) {
   }
 }
 
+const weatherLabel = (code = 0) => {
+  if (code >= 95) return 'Thunderstorm';
+  if (code >= 80) return 'Rain showers';
+  if (code >= 61) return 'Rain';
+  if (code >= 51) return 'Drizzle';
+  if (code >= 45) return 'Fog';
+  if (code >= 3) return 'Cloudy';
+  return 'Clear';
+};
+
+const calculateRisk = ({ precipitation = 0, windSpeed = 0, humidity = 0, cloudCover = 0, weatherCode = 0 }) => {
+  const rainRate = precipitation * 4;
+  const stormSignal = weatherCode >= 95 ? 34 : weatherCode >= 80 ? 20 : weatherCode >= 61 ? 13 : weatherCode >= 51 ? 7 : 0;
+  const factors = [
+    { name: 'Rain rate', value: `${rainRate.toFixed(1)} mm/h`, score: Math.round(rainRate * 2.4) },
+    { name: 'Wind', value: `${Math.round(windSpeed)} km/h`, score: Math.round(windSpeed * 1.05) },
+    { name: 'Humidity', value: `${Math.round(humidity)}%`, score: Math.round(Math.max(0, humidity - 70) * 0.8) },
+    { name: 'Cloud cover', value: `${Math.round(cloudCover)}%`, score: Math.round(cloudCover * 0.12) },
+    { name: 'WMO hazard code', value: weatherLabel(weatherCode), score: stormSignal },
+  ];
+  return { score: Math.min(100, Math.round(factors.reduce((total, factor) => total + factor.score, 0))), factors };
+};
+
+export async function fetchLiveNowcast(lat = 19.8762, lng = 75.3433) {
+  const params = new URLSearchParams({
+    latitude: String(lat),
+    longitude: String(lng),
+    current: 'temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code,cloud_cover,surface_pressure',
+    minutely_15: 'temperature_2m,precipitation,wind_speed_10m,weather_code',
+    forecast_days: '1',
+    timezone: 'Asia/Kolkata',
+  });
+
+  try {
+    const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+    if (!response.ok) throw new Error(`Open-Meteo returned ${response.status}`);
+    const data = await response.json();
+    const current = data.current;
+    const minutes = data.minutely_15;
+    const currentIndex = Math.max(0, minutes.time.findIndex((time) => time >= current.time));
+    const offsets = [0, 1, 2, 3, 4, 6];
+    const labels = ['Now', '+15m', '+30m', '+45m', '+60m', '+90m'];
+    const forecast = offsets.map((offset, index) => {
+      const point = Math.min(minutes.time.length - 1, currentIndex + offset);
+      const precipitation = minutes.precipitation[point] ?? 0;
+      const code = minutes.weather_code[point] ?? 0;
+      return {
+        time: labels[index],
+        temp: `${Math.round(minutes.temperature_2m[point] ?? current.temperature_2m)}°`,
+        rain: Math.round(precipitation * 4 * 10) / 10,
+        wind: Math.round(minutes.wind_speed_10m[point] ?? current.wind_speed_10m),
+        storm: code >= 80,
+        code,
+        condition: weatherLabel(code),
+      };
+    });
+    const risk = calculateRisk({
+      precipitation: current.precipitation,
+      windSpeed: current.wind_speed_10m,
+      humidity: current.relative_humidity_2m,
+      cloudCover: current.cloud_cover,
+      weatherCode: current.weather_code,
+    });
+
+    return {
+      success: true,
+      source: 'Open-Meteo live observation + AGNI-CAST risk model',
+      observedAt: current.time,
+      current: {
+        temp: current.temperature_2m,
+        humidity: current.relative_humidity_2m,
+        precipitation: current.precipitation,
+        rainRate: Math.round(current.precipitation * 4 * 10) / 10,
+        wind: current.wind_speed_10m,
+        cloudCover: current.cloud_cover,
+        pressure: current.surface_pressure,
+        code: current.weather_code,
+        condition: weatherLabel(current.weather_code),
+        rainClassification: current.precipitation >= 20 ? 'Severe Rain' : current.precipitation >= 5 ? 'Heavy Rain' : current.precipitation > 0 ? 'Normal Rain' : 'No Rain',
+        cloudBurstRisk: Math.min(100, Math.round((current.precipitation / 25) * 100 + (current.weather_code >= 61 ? 15 : 0))),
+        thunderstormRisk: current.weather_code >= 95 ? 98 : current.weather_code >= 80 ? 45 : current.cloud_cover > 70 ? 25 : 5,
+        flashFloodRisk: Math.min(100, Math.round((current.precipitation / 20) * 100 + (current.weather_code >= 80 ? 20 : 0))),
+      },
+      riskScore: risk.score,
+      factors: risk.factors,
+      confidence: Math.min(96, 78 + Math.round(current.cloud_cover / 8)),
+      forecast,
+    };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
 /**
  * Fetch Satellite & Terrain Telemetry Metadata Status
  */
@@ -172,3 +265,49 @@ export async function searchCityGeocoding(query) {
   }
 }
 
+/**
+ * Reverse geocode a lat/lng to get city/village name
+ */
+export async function reverseGeocode(lat, lng) {
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Reverse geocode failed');
+    const data = await res.json();
+    return data.address?.city || data.address?.town || data.address?.village || data.address?.state || 'Unknown Location';
+  } catch (err) {
+    console.warn('Reverse geocoding failed:', err);
+    return 'Unknown Location';
+  }
+}
+
+/**
+ * Fetch 5-day daily forecast from Open-Meteo
+ */
+export async function fetchDailyForecast(lat, lng) {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=weather_code,temperature_2m_max,temperature_2m_min,surface_pressure_max&timezone=auto`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Failed to fetch daily forecast');
+    const data = await res.json();
+    
+    if (!data.daily) return [];
+    
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return data.daily.time.map((timeStr, index) => {
+      const date = new Date(timeStr);
+      const isToday = new Date().toDateString() === date.toDateString();
+      return {
+        day: isToday ? 'Today' : days[date.getDay()],
+        minTemp: Math.round(data.daily.temperature_2m_min[index]),
+        maxTemp: Math.round(data.daily.temperature_2m_max[index]),
+        pressure: Math.round(data.daily.surface_pressure_max?.[index] || 1010),
+        code: data.daily.weather_code[index],
+        condition: weatherLabel(data.daily.weather_code[index])
+      };
+    }).slice(0, 5); // Return 5 days
+  } catch (err) {
+    console.warn('Failed to fetch daily forecast', err);
+    return [];
+  }
+}

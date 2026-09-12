@@ -1,406 +1,538 @@
-import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents, ZoomControl, Circle, Rectangle, FeatureGroup } from 'react-leaflet';
 import L from 'leaflet';
 import { useSimulation } from '../context/SimulationContext';
-import { WEATHER_DATA_BY_SCENARIO } from '../data/demoWeatherData';
-import { searchCityGeocoding } from '../services/weatherApi';
-import { MapPin, AlertTriangle, Clock, Zap, Layers, Satellite, Search, Loader2, RefreshCw, X } from 'lucide-react';
+import { fetchDailyForecast, fetchLiveNowcast, searchCityGeocoding, reverseGeocode } from '../services/weatherApi';
+import { 
+  Search, CloudRain, Wind, Thermometer, Droplets, Gauge, 
+  Map as MapIcon, Layers, Play, Pause, ChevronLeft, ChevronRight, X, Loader2, Maximize2, Globe2
+} from 'lucide-react';
 
-const MapRecenter = ({ center }) => {
+// Custom Map Controller to fly to locations
+const MapController = ({ center, zoom }) => {
   const map = useMap();
   useEffect(() => {
-    map.flyTo(center, 11, { duration: 1 });
-  }, [center, map]);
+    if (center) {
+      map.flyTo(center, zoom, { duration: 1.5 });
+    }
+  }, [center, zoom, map]);
   return null;
 };
 
-const getRiskColor = (riskLevel) => {
-  switch (riskLevel) {
-    case 'SAFE': return '#059669';
-    case 'LOW': return '#d97706';
-    case 'MODERATE': return '#ea580c';
-    case 'HIGH': return '#dc2626';
-    case 'EXTREME': return '#7c3aed';
-    default: return '#059669';
-  }
-};
-
-const createCustomMarker = (riskLevel, shortName, isSelected) => {
-  const color = getRiskColor(riskLevel);
-  const scale = isSelected ? 'scale(1.25)' : 'scale(1)';
-  const glow = isSelected ? `box-shadow: 0 0 16px ${color};` : '';
-
-  return L.divIcon({
-    className: 'custom-leaflet-marker',
-    html: `
-      <div style="transform: ${scale}; transition: all 0.25s ease; cursor: pointer; text-align: center;">
-        <div style="width: 22px; height: 22px; border-radius: 50%; background: ${color}; border: 2.5px solid #fff; margin: 0 auto; ${glow}"></div>
-        <div style="background: #ffffff; color: #1c1917; border: 1px solid #d6cebe; padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 800; margin-top: 3px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.12);">
-          ${shortName}
-        </div>
-      </div>
-    `,
-    iconSize: [22, 22],
-    iconAnchor: [11, 11]
+// Map click handler for "click anywhere" functionality
+const MapClickHandler = ({ onMapClick }) => {
+  useMapEvents({
+    click(e) {
+      onMapClick(e.latlng.lat, e.latlng.lng);
+    }
   });
+  return null;
 };
+
+// Weather Icon Helper
+const getWeatherIcon = (code) => {
+  if (code >= 95) return '🌩️';
+  if (code >= 80) return '🌧️';
+  if (code >= 61) return '☔';
+  if (code >= 51) return '🌦️';
+  if (code >= 45) return '🌫️';
+  if (code >= 3) return '☁️';
+  if (code >= 1) return '⛅';
+  return '☀️';
+};
+
+function DynamicGrid({ onBlockSelect, activeSectorPoint }) {
+  const map = useMap();
+  const [blocks, setBlocks] = useState([]);
+  
+  const updateGrid = () => {
+    if (map.getZoom() < 9) {
+      setBlocks([]); // Hide grid when zoomed out too far
+      return;
+    }
+    
+    const bounds = map.getBounds();
+    const centerLat = map.getCenter().lat;
+    
+    const GRID_SIZE_KM = 5;
+    const latStep = GRID_SIZE_KM / 111.32;
+    const lngStep = GRID_SIZE_KM / (111.32 * Math.cos(centerLat * Math.PI / 180));
+    
+    // Snap bounds to grid multiples for stability
+    const startLat = Math.floor(bounds.getSouth() / latStep) * latStep;
+    const endLat = Math.ceil(bounds.getNorth() / latStep) * latStep;
+    const startLng = Math.floor(bounds.getWest() / lngStep) * lngStep;
+    const endLng = Math.ceil(bounds.getEast() / lngStep) * lngStep;
+    
+    const newBlocks = [];
+    for (let lat = startLat; lat < endLat; lat += latStep) {
+      for (let lng = startLng; lng < endLng; lng += lngStep) {
+        newBlocks.push({
+          id: `${lat.toFixed(4)},${lng.toFixed(4)}`,
+          bounds: [
+            [lat, lng],
+            [lat + latStep, lng + lngStep]
+          ],
+          center: [lat + latStep/2, lng + lngStep/2]
+        });
+      }
+    }
+    setBlocks(newBlocks);
+  };
+
+  useMapEvents({
+    moveend: updateGrid,
+    zoomend: updateGrid
+  });
+
+  useEffect(() => {
+    updateGrid();
+  }, [map]);
+
+  return (
+    <FeatureGroup>
+      {blocks.map(block => {
+        const latStep = 5 / 111.32;
+        const lngStep = 5 / (111.32 * Math.cos(map.getCenter().lat * Math.PI / 180));
+        const isActive = activeSectorPoint && 
+          Math.abs(activeSectorPoint[0] - block.center[0]) < latStep/2 &&
+          Math.abs(activeSectorPoint[1] - block.center[1]) < lngStep/2;
+          
+        return (
+          <Rectangle 
+            key={block.id}
+            bounds={block.bounds}
+            pathOptions={{ 
+              color: isActive ? '#38bdf8' : '#475569', 
+              weight: isActive ? 2 : 1, 
+              fillOpacity: isActive ? 0.2 : 0.0,
+              dashArray: isActive ? '' : '2, 6'
+            }}
+            eventHandlers={{
+              click: () => onBlockSelect(block.center[0], block.center[1])
+            }}
+          />
+        );
+      })}
+    </FeatureGroup>
+  );
+}
 
 export const HyperLocalMap = () => {
-  const { 
-    selectedLocationId, 
-    setSelectedLocationId, 
-    locationsList,
-    customWeatherDataMap = {},
-    addAndSelectCity,
-    currentLocation,
-    currentWeather,
-    scenario, 
-    language 
-  } = useSimulation();
-
-  const [activeLayer, setActiveLayer] = useState('osm');
+  const { language } = useSimulation();
+  
+  // UI State
+  const [activeLayer, setActiveLayer] = useState('precipitation');
+  const [isPlaying, setIsPlaying] = useState(false);
+  
+  // Data State
+  const [mapCenter, setMapCenter] = useState([19.84, 75.25]); // Default to Maharashtra/Aurangabad region
+  const [mapZoom, setMapZoom] = useState(7);
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  
+  // Selected Point Data
+  const [selectedPoint, setSelectedPoint] = useState({
+    name: 'Maharashtra Region',
+    lat: 19.84,
+    lng: 75.25,
+    forecast: [],
+    current: null,
+    loading: false
+  });
 
-  const selectedLoc = locationsList.find(l => l.id === selectedLocationId) || locationsList[0];
-  const selectedWeatherData = currentWeather;
+  // Fetch data for a specific point
+  const fetchPointData = async (lat, lng, nameFallback = null) => {
+    setSelectedPoint(prev => ({ ...prev, loading: true, lat, lng }));
+    
+    // Reverse geocode if name isn't provided
+    let locationName = nameFallback;
+    if (!locationName) {
+      locationName = await reverseGeocode(lat, lng);
+    }
 
-  const tileUrls = {
-    osm: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    carto: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+    // Fetch Open-Meteo Data
+    const [dailyData, nowcastData] = await Promise.all([
+      fetchDailyForecast(lat, lng),
+      fetchLiveNowcast(lat, lng)
+    ]);
+
+    setSelectedPoint({
+      name: locationName,
+      lat,
+      lng,
+      forecast: dailyData,
+      current: nowcastData.success ? nowcastData.current : null,
+      loading: false
+    });
   };
 
-  // Debounced City Search
+  // Initial Load
+  useEffect(() => {
+    fetchPointData(19.84, 75.25, 'Chhatrapati Sambhajinagar');
+  }, []);
+
+  // Handle Search
   useEffect(() => {
     if (!searchQuery || searchQuery.trim().length < 2) {
       setSearchResults([]);
       setShowDropdown(false);
       return;
     }
-
     const timer = setTimeout(async () => {
       setIsSearching(true);
       const results = await searchCityGeocoding(searchQuery);
       setSearchResults(results);
       setIsSearching(false);
       setShowDropdown(true);
-    }, 350);
-
+    }, 400);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
   const handleSelectSearchResult = async (item) => {
     setShowDropdown(false);
     setSearchQuery('');
-    await addAndSelectCity(item);
+    setMapCenter([item.lat, item.lng]);
+    setMapZoom(11);
+    await fetchPointData(item.lat, item.lng, item.name);
   };
 
-  const handleQuickSearch = async (cityName) => {
-    setIsSearching(true);
-    const results = await searchCityGeocoding(cityName);
-    if (results && results.length > 0) {
-      await addAndSelectCity(results[0]);
-    }
-    setIsSearching(false);
+  const handleMapClick = async (lat, lng) => {
+    setMapCenter([lat, lng]);
+    await fetchPointData(lat, lng);
   };
+
+  // Timeline Mock Data
+  const [timeIndex, setTimeIndex] = useState(4);
+
+  const isSevere = selectedPoint.current && selectedPoint.current.code >= 61;
+  const isThunderstorm = selectedPoint.current && selectedPoint.current.code >= 95;
 
   return (
-    <section className="bg-white border-2 border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 section-pop-hover">
+    <section className="bg-stone-900 rounded-3xl overflow-hidden shadow-2xl relative border border-stone-700 h-[800px] flex flex-col font-sans section-pop-hover">
       
-      {/* Section Header with Ref Image Style Badge */}
-      <div className="text-center space-y-2 max-w-3xl mx-auto border-b border-stone-200 pb-6">
-        <div className="inline-flex items-center space-x-2 px-4 py-1 rounded-full text-xs font-mono font-bold bg-sky-100 text-sky-950 border border-sky-300 shadow-2xs">
-          <Layers className="w-3.5 h-3.5 text-sky-700" />
-          <span>02 / GEOSPATIAL MAP & SECTOR INTELLIGENCE</span>
-        </div>
+      {/* MAP CONTAINER - Full size, underneath UI */}
+      <div className="absolute inset-0 z-0 map-zoom-earth-style">
+        <MapContainer 
+          center={mapCenter} 
+          zoom={mapZoom} 
+          zoomControl={false}
+          className="w-full h-full"
+          style={{ background: '#111827' }}
+        >
+          {/* Real Google Maps street map for authentic locations */}
+          <TileLayer
+            attribution='&copy; Google Maps'
+            url={activeLayer === 'satellite' 
+              ? "http://mt1.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}" 
+              : "http://mt1.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}"}
+          />
+          <MapController center={mapCenter} zoom={mapZoom} />
+          <MapClickHandler onMapClick={handleMapClick} />
+          <ZoomControl position="bottomright" />
 
-        <h2 className="text-2xl sm:text-4xl font-black text-stone-900 tracking-tight">
-          Hyper-Local Geospatial Risk & City Radar Map
-        </h2>
+          {/* Dynamic 5x5 km visual grid */}
+          <DynamicGrid onBlockSelect={handleMapClick} activeSectorPoint={[selectedPoint.lat, selectedPoint.lng]} />
 
-        <p className="text-xs sm:text-sm text-stone-600 font-medium leading-relaxed">
-          Search ANY city or district across India for live satellite & weather telemetry. Fuses Open-Meteo geocoding, INSAT-3DR satellite infrared cloud imagery, and Gemini AI zero-shot risk nowcasts.
-        </p>
+          {/* Severe Weather Renderings inside Grid */}
+          {activeLayer === 'radar' && isSevere && (
+            <>
+              <Circle 
+                center={[selectedPoint.lat, selectedPoint.lng]} 
+                radius={2000} 
+                pathOptions={{ color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.5, weight: 0 }} 
+                className="pulse-radar"
+              />
+              <Circle 
+                center={[selectedPoint.lat + 0.005, selectedPoint.lng - 0.005]} 
+                radius={1200} 
+                pathOptions={{ color: '#f97316', fillColor: '#f97316', fillOpacity: 0.6, weight: 0 }} 
+                className="pulse-radar"
+                style={{ animationDelay: '0.5s' }}
+              />
+            </>
+          )}
+
+          {isThunderstorm && (
+            <Marker 
+              position={[selectedPoint.lat + 0.01, selectedPoint.lng - 0.01]}
+              icon={L.divIcon({
+                className: 'bg-transparent',
+                html: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 0px 6px #eab308); animation: flash 1.5s infinite;"><path d="M11 2v10h4l-4 10v-10h-4z" fill="#eab308"></path></svg>`
+              })}
+            />
+          )}
+
+          {/* Marker for selected point */}
+          <Marker 
+            position={[selectedPoint.lat, selectedPoint.lng]}
+            icon={L.divIcon({
+              className: 'bg-transparent',
+              html: `<div style="transform: translate(-50%, -100%);">
+                       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.8));">
+                         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" fill="#38bdf840"></path>
+                         <circle cx="12" cy="10" r="3" fill="#38bdf8"></circle>
+                       </svg>
+                     </div>`
+            })}
+          />
+        </MapContainer>
+
+        {/* Global Styles */}
+        <style dangerouslySetInnerHTML={{__html: `
+          .leaflet-container {
+            font-family: inherit;
+          }
+          .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+            border-radius: 4px;
+          }
+          .pulse-radar { animation: pulseRadar 2s infinite; }
+          @keyframes pulseRadar { 0% { fill-opacity: 0.6; } 50% { fill-opacity: 0.2; } 100% { fill-opacity: 0.6; } }
+          @keyframes flash { 0% { opacity: 1; } 10% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 1; } }
+        `}} />
       </div>
 
-      {/* SEARCH BOX FOR CITY & DISTRICT */}
-      <div className="bg-stone-50 p-4 rounded-2xl border-2 border-stone-300 space-y-3 shadow-2xs relative">
-        <div className="flex items-center justify-between gap-3">
-          <div className="relative flex-1">
-            <div className="relative flex items-center">
-              <Search className="w-4 h-4 text-stone-400 absolute left-3.5 pointer-events-none" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => searchQuery.length >= 2 && setShowDropdown(true)}
-                placeholder="🔍 Type city or district name (e.g., Mumbai, Pune, Delhi, Nashik, Bengaluru)..."
-                className="w-full pl-10 pr-10 py-2.5 bg-white border-2 border-amber-800/40 focus:border-amber-800 rounded-xl text-stone-900 font-semibold text-xs shadow-2xs focus:outline-none transition"
-              />
-              {isSearching ? (
-                <Loader2 className="w-4 h-4 text-amber-800 animate-spin absolute right-3" />
-              ) : searchQuery ? (
-                <button onClick={() => setSearchQuery('')} className="absolute right-3 text-stone-400 hover:text-stone-700">
-                  <X className="w-4 h-4" />
-                </button>
-              ) : null}
-            </div>
-
-            {/* Search Suggestion Dropdown */}
-            {showDropdown && searchResults.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-amber-800/60 rounded-xl shadow-2xl z-[500] max-h-60 overflow-y-auto divide-y divide-stone-100 font-mono text-xs">
-                {searchResults.map((res) => (
-                  <button
-                    key={res.id}
-                    onClick={() => handleSelectSearchResult(res)}
-                    className="w-full text-left p-3 hover:bg-amber-50/80 transition flex items-center justify-between cursor-pointer"
-                  >
-                    <div>
-                      <div className="font-bold text-stone-900">{res.shortName}</div>
-                      <div className="text-[10px] text-stone-500">{res.category}</div>
-                    </div>
-                    <div className="text-[10px] font-mono text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded border border-amber-300">
-                      {res.coordinates[0].toFixed(2)}°N, {res.coordinates[1].toFixed(2)}°E
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
+      {/* FLOATING UI OVERLAYS (Z-INDEX 10) */}
+      
+      {/* TOP LEFT: Brand & Search */}
+      <div className="absolute top-4 left-4 z-10 flex flex-col gap-4 w-72">
+        {/* Brand Logo mimic */}
+        <div className="bg-slate-800/90 backdrop-blur-md rounded-xl p-3 flex items-center gap-3 border border-slate-700/50 shadow-lg text-white">
+          <div className="bg-sky-500 w-8 h-8 rounded-full flex items-center justify-center">
+            <Globe2 className="w-5 h-5 text-white" />
           </div>
-
-          <div className="hidden sm:flex items-center space-x-1 bg-white p-1 rounded-xl border border-stone-300 text-[11px] font-mono font-bold">
-            <button
-              onClick={() => setActiveLayer('osm')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${activeLayer === 'osm' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'text-stone-600 hover:text-stone-900'}`}
-            >
-              OpenStreetMap
-            </button>
-            <button
-              onClick={() => setActiveLayer('carto')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${activeLayer === 'carto' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'text-stone-600 hover:text-stone-900'}`}
-            >
-              Carto Voyager
-            </button>
+          <div>
+            <div className="font-black text-sm leading-tight tracking-wide">AGNI-CAST</div>
+            <div className="text-[10px] text-slate-300 font-medium tracking-widest uppercase">SIH26077 Live</div>
           </div>
         </div>
 
-        {/* Quick Search City Chips */}
-        <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar font-mono text-xs pt-1">
-          <span className="text-stone-400 font-bold text-[10px] uppercase">POPULAR SEARCHES:</span>
-          {['Mumbai', 'Pune', 'Nashik', 'Delhi', 'Bengaluru', 'Nagpur', 'Latur'].map((city) => (
-            <button
-              key={city}
-              onClick={() => handleQuickSearch(city)}
-              className="px-2.5 py-1 rounded-lg bg-white hover:bg-amber-100 text-stone-800 border border-stone-200 text-[11px] font-semibold transition cursor-pointer shadow-2xs whitespace-nowrap"
+        {/* Search Bar */}
+        <div className="relative">
+          <div className="relative flex items-center bg-slate-800/90 backdrop-blur-md rounded-xl border border-slate-700/50 shadow-lg overflow-hidden">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery.length >= 2 && setShowDropdown(true)}
+              placeholder="Search city, district, village..."
+              className="w-full pl-9 pr-9 py-3 bg-transparent text-white text-sm focus:outline-none placeholder-slate-400 font-medium"
+            />
+            {isSearching ? (
+              <Loader2 className="w-4 h-4 text-sky-400 animate-spin absolute right-3" />
+            ) : searchQuery ? (
+              <button onClick={() => setSearchQuery('')} className="absolute right-3 text-slate-400 hover:text-white cursor-pointer">
+                <X className="w-4 h-4" />
+              </button>
+            ) : null}
+          </div>
+
+          {showDropdown && searchResults.length > 0 && (
+            <div className="absolute top-full mt-2 w-full bg-slate-800/95 backdrop-blur-xl border border-slate-700 rounded-xl shadow-2xl max-h-60 overflow-y-auto custom-scrollbar text-sm z-50">
+              {searchResults.map((res) => (
+                <button
+                  key={res.id}
+                  onClick={() => handleSelectSearchResult(res)}
+                  className="w-full text-left px-4 py-3 hover:bg-slate-700/50 transition border-b border-slate-700/50 last:border-0 flex flex-col text-white"
+                >
+                  <span className="font-bold">{res.shortName}</span>
+                  <span className="text-[10px] text-slate-400 mt-0.5">{res.category}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* LEFT SIDEBAR: Layer Controls */}
+      <div className="absolute top-44 left-4 z-10 w-48 bg-slate-800/90 backdrop-blur-md rounded-xl border border-slate-700/50 shadow-lg text-white overflow-hidden">
+        <div className="p-3 border-b border-slate-700/50 bg-slate-800/50">
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <MapIcon className="w-3 h-3" /> LIVE MAPS
+          </div>
+        </div>
+        <div className="p-2 flex flex-col gap-1">
+          <button className={`flex items-center gap-3 p-2 rounded-lg text-sm font-medium transition cursor-pointer ${activeLayer === 'satellite' ? 'bg-sky-500/20 text-sky-400' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'}`} onClick={() => setActiveLayer('satellite')}>
+            <Satellite className="w-4 h-4" /> Satellite
+          </button>
+          <button className={`flex items-center gap-3 p-2 rounded-lg text-sm font-medium transition cursor-pointer ${activeLayer === 'radar' ? 'bg-sky-500/20 text-sky-400' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'}`} onClick={() => setActiveLayer('radar')}>
+            <Layers className="w-4 h-4" /> Radar
+          </button>
+        </div>
+
+        <div className="p-3 border-b border-t border-slate-700/50 bg-slate-800/50 mt-1">
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <CloudRain className="w-3 h-3" /> FORECAST MAPS
+          </div>
+        </div>
+        <div className="p-2 flex flex-col gap-1 mb-1">
+          {[
+            { id: 'precipitation', icon: CloudRain, label: 'Precipitation' },
+            { id: 'wind', icon: Wind, label: 'Wind' },
+            { id: 'temperature', icon: Thermometer, label: 'Temperature' },
+            { id: 'humidity', icon: Droplets, label: 'Humidity' },
+            { id: 'pressure', icon: Gauge, label: 'Pressure' }
+          ].map(layer => (
+            <button 
+              key={layer.id}
+              className={`flex items-center gap-3 p-2 rounded-lg text-sm font-medium transition cursor-pointer ${activeLayer === layer.id ? 'bg-sky-500/20 text-sky-400' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'}`}
+              onClick={() => setActiveLayer(layer.id)}
             >
-              📍 {city}
+              <layer.icon className="w-4 h-4" /> {layer.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Sector Quick Switcher Bar */}
-      <div className="flex items-center justify-between flex-wrap gap-2 bg-stone-50 p-2 rounded-2xl border border-stone-200 font-mono text-xs">
-        <div className="flex items-center space-x-1.5 overflow-x-auto max-w-full py-1">
-          <span className="text-stone-400 font-bold px-2 text-[10px] hidden sm:inline">ACTIVE LOCATIONS:</span>
-          {locationsList.map((loc) => {
-            const rawWeather = customWeatherDataMap[loc.id] || (WEATHER_DATA_BY_SCENARIO[scenario]?.[loc.id] || WEATHER_DATA_BY_SCENARIO[scenario]?.waluj || {});
-            const locWeather = loc.id === selectedLocationId ? currentWeather : {
-              riskLevel: 'SAFE',
-              riskScore: 18,
-              expectedTime: 'Stable',
-              ...rawWeather
-            };
-            const isSelected = loc.id === selectedLocationId;
-            const colorHex = getRiskColor(locWeather.riskLevel || 'SAFE');
+      {/* TOP RIGHT: Detailed Forecast Panel */}
+      <div className="absolute top-4 right-4 z-10 w-80 bg-slate-800/90 backdrop-blur-md rounded-xl border border-slate-700/50 shadow-2xl text-white flex flex-col">
+        {selectedPoint.loading && (
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm z-20 flex items-center justify-center rounded-xl">
+            <Loader2 className="w-8 h-8 text-sky-400 animate-spin" />
+          </div>
+        )}
+        
+        {/* Header: Location & Current Data */}
+        <div className="p-4 border-b border-slate-700/50 bg-slate-800/80 rounded-t-xl">
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="font-bold text-lg leading-tight w-5/6 line-clamp-2">
+              {selectedPoint.name}
+            </h3>
+            <button className="text-slate-400 hover:text-white cursor-pointer">
+              <Maximize2 className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex flex-col gap-1 mb-4">
+            <div className="flex justify-between items-center">
+              <div className="text-xs text-sky-400 font-bold tracking-wider uppercase bg-sky-500/10 border border-sky-500/20 px-2 py-1 rounded w-fit">
+                5x5 KM GRID BLOCK
+              </div>
+              {selectedPoint.current?.rainClassification && (
+                <div className="text-[10px] text-white font-bold bg-slate-700/80 border border-slate-600 px-2 py-1 rounded">
+                  {selectedPoint.current.rainClassification}
+                </div>
+              )}
+            </div>
+            <div className="text-[10px] text-slate-400 font-mono">
+              {selectedPoint.lat.toFixed(2)}° N, {selectedPoint.lng.toFixed(2)}° E
+            </div>
+            {isSevere && (
+              <div className="mt-1 text-[10px] font-bold text-red-400 flex items-center gap-1 border border-red-500/30 bg-red-500/10 px-2 py-1 rounded w-fit">
+                <CloudRain className="w-3 h-3" /> Cloudburst / Severe Activity Detected
+              </div>
+            )}
+          </div>
+          
+          {selectedPoint.current && (
+            <div className="grid grid-cols-3 gap-2 text-sm text-center mb-1">
+              <div className="bg-slate-700/50 p-1.5 rounded-lg border border-slate-600/30">
+                <div className="text-[9px] text-slate-400 uppercase font-bold">Flash Flood</div>
+                <div className={`font-bold text-lg ${selectedPoint.current.flashFloodRisk > 50 ? 'text-sky-400' : 'text-slate-200'}`}>{selectedPoint.current.flashFloodRisk}%</div>
+              </div>
+              <div className="bg-slate-700/50 p-1.5 rounded-lg border border-slate-600/30">
+                <div className="text-[9px] text-slate-400 uppercase font-bold">Cloudburst</div>
+                <div className={`font-bold text-lg ${selectedPoint.current.cloudBurstRisk > 50 ? 'text-rose-400' : 'text-slate-200'}`}>{selectedPoint.current.cloudBurstRisk}%</div>
+              </div>
+              <div className="bg-slate-700/50 p-1.5 rounded-lg border border-slate-600/30">
+                <div className="text-[9px] text-slate-400 uppercase font-bold">Thunderstorm</div>
+                <div className={`font-bold text-lg ${selectedPoint.current.thunderstormRisk > 50 ? 'text-amber-400' : 'text-slate-200'}`}>{selectedPoint.current.thunderstormRisk}%</div>
+              </div>
+            </div>
+          )}
+        </div>
 
-            return (
-              <button
-                key={loc.id}
-                onClick={() => setSelectedLocationId(loc.id)}
-                className={`px-3 py-1.5 rounded-xl font-bold transition flex items-center space-x-1.5 cursor-pointer whitespace-nowrap ${
-                  isSelected 
-                    ? 'bg-stone-900 text-white shadow-xs' 
-                    : 'bg-white hover:bg-stone-200/70 text-stone-700 border border-stone-200'
-                }`}
-              >
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: colorHex }}></span>
-                <span>{loc.shortName || loc.name}</span>
-              </button>
-            );
-          })}
+        {/* 5-Day Forecast List */}
+        <div className="p-2 flex flex-col gap-1 flex-1">
+          <div className="grid grid-cols-4 px-3 py-1 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+            <div className="col-span-1">Day</div>
+            <div className="col-span-1 text-center">Min</div>
+            <div className="col-span-2 text-right">Pressure / Max</div>
+          </div>
+          
+          {selectedPoint.forecast.length > 0 ? (
+             selectedPoint.forecast.map((day, idx) => (
+              <div key={idx} className={`grid grid-cols-4 items-center px-3 py-2 rounded-lg text-sm ${idx === 0 ? 'bg-sky-500/10 border border-sky-500/20' : 'hover:bg-slate-700/30'}`}>
+                <div className="col-span-1 font-bold">{day.day}</div>
+                <div className="col-span-1 flex items-center justify-center gap-1">
+                  <span className="text-lg">{getWeatherIcon(day.code)}</span>
+                  <span className="text-slate-300 font-mono">{day.minTemp}°</span>
+                </div>
+                <div className="col-span-2 flex items-center justify-end gap-3 font-mono">
+                  <span className="text-slate-400 text-xs">{day.pressure}</span>
+                  <span className="w-8 h-1 bg-gradient-to-r from-sky-400 to-rose-400 rounded-full hidden sm:block"></span>
+                  <span className="font-bold">{day.maxTemp}°</span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="p-4 text-center text-slate-400 text-sm font-medium">
+              Click anywhere on the map to fetch live data.
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Main Section Level Map Container & Sector Panel Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-        
-        {/* Full Section Level Map View (Height h-[540px]) */}
-        <div className="lg:col-span-2 relative h-[480px] sm:h-[540px] rounded-2xl overflow-hidden border-2 border-stone-300 shadow-md">
-          
-          {/* Overlay Status Badge */}
-          <div className="absolute top-3 left-3 z-[400] bg-stone-950/90 text-white p-2.5 rounded-xl border border-stone-800 backdrop-blur-md shadow-lg font-mono text-[11px] space-y-1">
-            <div className="flex items-center space-x-2 font-bold text-amber-400">
-              <Satellite className="w-3.5 h-3.5 text-sky-400 animate-pulse" />
-              <span>INSAT-3DR Satellite Stream Active</span>
-            </div>
-            <div className="text-[10px] text-stone-300">
-              Active Monitored City: <strong className="text-white">{selectedLoc?.name || 'waluj'}</strong>
-            </div>
-          </div>
-
-          {/* Leaflet Map */}
-          <MapContainer
-            center={selectedLoc?.coordinates || [19.843, 75.251]}
-            zoom={11}
-            scrollWheelZoom={true}
-            className="w-full h-full z-10"
+      {/* BOTTOM TIMELINE */}
+      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10 pointer-events-auto">
+        <div className="bg-slate-800/90 backdrop-blur-md rounded-full border border-slate-700/50 shadow-2xl text-white px-4 py-2 flex items-center gap-4">
+          <button 
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="w-8 h-8 rounded-full bg-sky-500 hover:bg-sky-400 flex items-center justify-center text-white transition shadow-lg shadow-sky-500/20 cursor-pointer"
           >
-            <MapRecenter center={selectedLoc?.coordinates || [19.843, 75.251]} />
-            <TileLayer
-              attribution='&copy; OpenStreetMap &copy; CARTO GIS'
-              url={tileUrls[activeLayer]}
-            />
-
-            {locationsList.map((loc) => {
-              const rawWeather = customWeatherDataMap[loc.id] || (WEATHER_DATA_BY_SCENARIO[scenario]?.[loc.id] || WEATHER_DATA_BY_SCENARIO[scenario]?.waluj || {});
-              const locWeather = loc.id === selectedLocationId ? currentWeather : {
-                riskLevel: 'SAFE',
-                riskScore: 18,
-                expectedTime: 'Stable',
-                ...rawWeather
-              };
-              const isSelected = loc.id === selectedLocationId;
-              const colorHex = getRiskColor(locWeather.riskLevel || 'SAFE');
-
-              return (
-                <React.Fragment key={loc.id}>
-                  {/* Convective Risk Polygon Circle */}
-                  <Circle
-                    center={loc.coordinates}
-                    radius={3000}
-                    pathOptions={{
-                      color: colorHex,
-                      fillColor: colorHex,
-                      fillOpacity: isSelected ? 0.32 : 0.12,
-                      weight: isSelected ? 3 : 1.5
-                    }}
-                  />
-
-                  {/* Marker */}
-                  <Marker
-                    position={loc.coordinates}
-                    icon={createCustomMarker(locWeather.riskLevel || 'SAFE', loc.shortName || loc.name, isSelected)}
-                    eventHandlers={{ click: () => setSelectedLocationId(loc.id) }}
-                  >
-                    <Popup>
-                      <div className="p-1 text-xs space-y-1 font-sans">
-                        <div className="font-bold text-stone-900">{loc.name}</div>
-                        <div className="font-mono text-[11px]">
-                          Risk Level: <strong style={{ color: colorHex }}>{locWeather.riskLevel}</strong> ({locWeather.riskScore}/100)
-                        </div>
-                        <div className="text-[10px] text-stone-500 font-mono">
-                          Lead Time: {locWeather.expectedTime}
-                        </div>
-                      </div>
-                    </Popup>
-                  </Marker>
-                </React.Fragment>
-              );
-            })}
-          </MapContainer>
-        </div>
-
-        {/* Dedicated Sector Telemetry Panel */}
-        <div className="bg-stone-50 border-2 border-stone-200 rounded-2xl p-5 space-y-4 text-xs flex flex-col justify-between shadow-2xs">
+            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+          </button>
           
-          <div className="space-y-3">
-            <div className="border-b border-stone-200 pb-3 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-mono text-stone-400 font-bold uppercase tracking-wider block">
-                  SEARCHED CITY TELEMETRY
-                </span>
-                <h3 className="text-lg font-black text-stone-900 mt-0.5">
-                  {selectedLoc?.name || 'Waluj Industrial'}
-                </h3>
-              </div>
-              <span className="px-2.5 py-1 rounded-lg bg-white border border-stone-300 font-mono font-bold text-[11px] text-stone-800 shadow-2xs">
-                {(selectedLoc?.coordinates?.[0] || 19.84).toFixed(2)}°N
-              </span>
-            </div>
-
-            <div className="space-y-2 font-mono text-[11px]">
-              <div className="flex justify-between p-2 rounded-lg bg-white border border-stone-200">
-                <span className="text-stone-500">Risk Assessment:</span>
-                <span className="font-bold text-stone-900" style={{ color: getRiskColor(selectedWeatherData?.riskLevel || 'SAFE') }}>
-                  {selectedWeatherData?.riskLevel || 'SAFE'} ({selectedWeatherData?.riskScore || 18}/100)
-                </span>
-              </div>
-
-              <div className="flex justify-between p-2 rounded-lg bg-white border border-stone-200">
-                <span className="text-stone-500">Early Warning Window:</span>
-                <span className="font-bold text-stone-900">{selectedWeatherData?.expectedTime || 'Stable'}</span>
-              </div>
-
-              <div className="flex justify-between p-2 rounded-lg bg-white border border-stone-200">
-                <span className="text-stone-500">Gemini Confidence:</span>
-                <span className="font-bold text-emerald-800">{selectedWeatherData?.predictionConfidence || '92%'}</span>
-              </div>
-
-              <div className="flex justify-between p-2 rounded-lg bg-white border border-stone-200">
-                <span className="text-stone-500">Live Temperature:</span>
-                <span className="font-bold text-stone-900">{selectedWeatherData?.temp || '31.2'} °C</span>
-              </div>
-
-              <div className="flex justify-between p-2 rounded-lg bg-white border border-stone-200">
-                <span className="text-stone-500">Rainfall Rate:</span>
-                <span className="font-bold text-amber-900">{selectedWeatherData?.currentRainfall || `${selectedWeatherData?.rainfall || 0} mm/h`}</span>
-              </div>
-
-              <div className="flex justify-between p-2 rounded-lg bg-white border border-stone-200">
-                <span className="text-stone-500">Wind Velocity:</span>
-                <span className="font-bold text-stone-900">{selectedWeatherData?.currentWindSpeed || `${selectedWeatherData?.windSpeed || 12} km/h`}</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-amber-50/80 border border-amber-300 space-y-1">
-              <span className="font-bold text-amber-950 block text-[11px] font-mono">
-                ⚡ Recommended Action Advisory:
-              </span>
-              <p className="text-stone-800 italic text-xs leading-relaxed">
-                "{selectedWeatherData?.recommendedAction?.[language] || selectedWeatherData?.recommendedAction?.en || 'Normal conditions. Maintain routine weather monitoring.'}"
-              </p>
-            </div>
-          </div>
-
-          <div className="pt-2 space-y-2">
-            <button
-              onClick={() => alert(`CAP v1.2 Cell Broadcast Warning dispatched to all base stations in ${selectedLoc.name}`)}
-              className="w-full py-3 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2 cursor-pointer"
+          <div className="flex items-center gap-3 font-mono text-sm">
+            <button 
+              onClick={() => setTimeIndex(Math.max(0, timeIndex - 1))}
+              className="text-slate-400 hover:text-white transition p-1 cursor-pointer"
             >
-              <Zap className="w-4 h-4 text-amber-400" />
-              <span>Dispatch CAP v1.2 Warning for {selectedLoc.shortName}</span>
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            
+            <div className="font-bold bg-slate-700/50 px-4 py-1 rounded-lg tabular-nums tracking-wider min-w-[140px] text-center">
+              12 Sept <span className="text-sky-400">{timelineTimes[timeIndex]}</span>
+            </div>
+            
+            <button 
+              onClick={() => setTimeIndex(Math.min(timelineTimes.length - 1, timeIndex + 1))}
+              className="text-slate-400 hover:text-white transition p-1 cursor-pointer"
+            >
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
-        </div>
+          <div className="h-6 w-px bg-slate-700/50 mx-2"></div>
 
+          <div className="text-xs font-bold text-slate-400 flex items-center gap-1">
+            ICON <span className="font-normal text-slate-500">13 km</span>
+          </div>
+        </div>
       </div>
 
-      {/* Map Risk Color Scale Legend */}
-      <div className="pt-2 border-t border-stone-200 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-        <span className="text-stone-500 font-bold text-[11px]">RISK SCALE THRESHOLDS:</span>
-        <div className="flex items-center flex-wrap gap-3 text-[11px]">
-          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-600"></span> 🟢 SAFE (0-30)</span>
-          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-600"></span> 🟡 LOW (31-50)</span>
-          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-orange-600"></span> 🟠 MODERATE (51-70)</span>
-          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-rose-600"></span> 🔴 HIGH (71-85)</span>
-          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-purple-600"></span> 🟣 EXTREME CLOUDBURST (86-100)</span>
+      {/* LEGEND (Bottom Left) */}
+      <div className="absolute bottom-6 left-4 z-10">
+        <div className="flex rounded-md overflow-hidden shadow-xl border border-slate-700/50 text-[10px] font-bold">
+          <div className="bg-[#1e3a8a] text-white px-2 py-1 border-r border-slate-700/30">hPa</div>
+          <div className="bg-[#1e40af] text-white px-2 py-1">970</div>
+          <div className="bg-[#3b82f6] text-white px-2 py-1">985</div>
+          <div className="bg-[#60a5fa] text-slate-900 px-2 py-1">1000</div>
+          <div className="bg-[#e2e8f0] text-slate-900 px-2 py-1">1015</div>
+          <div className="bg-[#ef4444] text-white px-2 py-1">1030</div>
+          <div className="bg-[#b91c1c] text-white px-2 py-1">1045</div>
         </div>
       </div>
 
     </section>
   );
 };
+
+export default HyperLocalMap;
