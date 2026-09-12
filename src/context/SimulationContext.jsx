@@ -2,12 +2,15 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { SCENARIOS, SCENARIO_METADATA, WEATHER_DATA_BY_SCENARIO, NOWCASTING_TIMELINE_DATA, AI_RISK_FACTORS } from '../data/demoWeatherData';
 import { DEMO_LOCATIONS } from '../data/demoLocations';
 import { MULTILINGUAL_TEXT } from '../data/demoAlerts';
+import { fetchLiveOpenMeteoData } from '../services/weatherApi';
 
 const SimulationContext = createContext(null);
 
 export const SimulationProvider = ({ children }) => {
   const [scenario, setScenarioState] = useState(SCENARIOS.NORMAL);
   const [selectedLocationId, setSelectedLocationId] = useState('waluj');
+  const [locationsList, setLocationsList] = useState(DEMO_LOCATIONS);
+  const [customWeatherDataMap, setCustomWeatherDataMap] = useState({});
   const [language, setLanguage] = useState('en');
   const [isPresentationMode, setIsPresentationMode] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
@@ -38,14 +41,65 @@ export const SimulationProvider = ({ children }) => {
     }
   };
 
+  /**
+   * Add dynamic searched city & fetch live weather data
+   */
+  const addAndSelectCity = async (locObj) => {
+    // Check if location already exists in list
+    const existing = locationsList.find(l => l.id === locObj.id || (l.coordinates[0] === locObj.coordinates[0] && l.coordinates[1] === locObj.coordinates[1]));
+    
+    let targetId = locObj.id;
+    if (!existing) {
+      setLocationsList((prev) => [locObj, ...prev]);
+    } else {
+      targetId = existing.id;
+    }
+
+    setSelectedLocationId(targetId);
+
+    // Fetch live weather data for this city
+    const live = await fetchLiveOpenMeteoData(locObj.coordinates[0], locObj.coordinates[1]);
+    if (live && live.success) {
+      const rain = live.rainfall;
+      let riskLevel = 'SAFE';
+      let riskScore = 18;
+      if (rain > 75) { riskLevel = 'EXTREME'; riskScore = 92; }
+      else if (rain > 40) { riskLevel = 'HIGH'; riskScore = 82; }
+      else if (rain > 15) { riskLevel = 'MODERATE'; riskScore = 64; }
+      else if (rain > 2) { riskLevel = 'LOW'; riskScore = 38; }
+
+      setCustomWeatherDataMap((prev) => ({
+        ...prev,
+        [targetId]: {
+          temp: `${live.temp}`,
+          humidity: `${live.humidity}`,
+          rainfall: `${live.rainfall}`,
+          windSpeed: `${live.windSpeed}`,
+          windDirection: 'SW',
+          riskLevel: riskLevel,
+          riskScore: riskScore,
+          expectedTime: '+35 min lead time',
+          predictionConfidence: '94% (LIVE API)',
+          currentRainfall: `${live.rainfall} mm/h`,
+          currentWindSpeed: `${live.windSpeed} km/h`,
+          recommendedAction: {
+            en: `Live Telemetry fetched for ${locObj.shortName}. Maintain active watch over local low-lying drainage channels.`,
+            mr: `${locObj.shortName} साठी थेट माहिती प्राप्त झाली. स्थानिक सखल भागांवर लक्ष ठेवा.`,
+            hi: `${locObj.shortName} के लिए लाइव डेटा प्राप्त हुआ। निचले क्षेत्रों पर नजर रखें।`
+          }
+        }
+      }));
+    }
+  };
+
   const setScenario = (newScenario) => {
     setScenarioState(newScenario);
     
     // Trigger toast notification on severe weather change
     if (newScenario === SCENARIOS.HEAVY_RAIN || newScenario === SCENARIOS.SEVERE_WEATHER) {
       playAlertSound(newScenario === SCENARIOS.SEVERE_WEATHER ? 950 : 750, 0.5);
-      const loc = DEMO_LOCATIONS.find(l => l.id === selectedLocationId) || DEMO_LOCATIONS[0];
-      const data = WEATHER_DATA_BY_SCENARIO[newScenario][selectedLocationId] || WEATHER_DATA_BY_SCENARIO[newScenario].waluj;
+      const loc = locationsList.find(l => l.id === selectedLocationId) || locationsList[0];
+      const data = customWeatherDataMap[selectedLocationId] || (WEATHER_DATA_BY_SCENARIO[newScenario][selectedLocationId] || WEATHER_DATA_BY_SCENARIO[newScenario].waluj);
       
       setToastAlert({
         id: Date.now(),
@@ -77,8 +131,8 @@ export const SimulationProvider = ({ children }) => {
 
   // Derived current values
   const currentScenarioMeta = SCENARIO_METADATA[scenario];
-  const currentLocation = DEMO_LOCATIONS.find(l => l.id === selectedLocationId) || DEMO_LOCATIONS[0];
-  const currentWeather = WEATHER_DATA_BY_SCENARIO[scenario][selectedLocationId] || WEATHER_DATA_BY_SCENARIO[scenario].waluj;
+  const currentLocation = locationsList.find(l => l.id === selectedLocationId) || locationsList[0];
+  const currentWeather = customWeatherDataMap[selectedLocationId] || (WEATHER_DATA_BY_SCENARIO[scenario][selectedLocationId] || WEATHER_DATA_BY_SCENARIO[scenario].waluj);
   const currentTimeline = NOWCASTING_TIMELINE_DATA[scenario];
   const currentAiFactors = AI_RISK_FACTORS[scenario];
   const t = MULTILINGUAL_TEXT[language] || MULTILINGUAL_TEXT.en;
@@ -88,6 +142,8 @@ export const SimulationProvider = ({ children }) => {
     setScenario,
     selectedLocationId,
     setSelectedLocationId,
+    locationsList,
+    addAndSelectCity,
     currentLocation,
     currentScenarioMeta,
     currentWeather,

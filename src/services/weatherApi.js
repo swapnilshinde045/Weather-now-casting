@@ -141,3 +141,34 @@ export async function fetchSatelliteTerrainTelemetry() {
     googleMapsStatus: 'Spatial Vector Tiles Loaded'
   };
 }
+
+/**
+ * Search any city, town or district in India/worldwide via Open-Meteo Geocoding API
+ */
+export async function searchCityGeocoding(query) {
+  if (!query || query.trim().length < 2) return [];
+  try {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query.trim())}&count=6&language=en&format=json`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Geocoding HTTP Error ${res.status}`);
+    const data = await res.json();
+    
+    if (!data.results || data.results.length === 0) return [];
+    
+    return data.results.map((item) => ({
+      id: item.name.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + item.id,
+      name: item.name + (item.admin1 ? `, ${item.admin1}` : '') + (item.country ? ` (${item.country})` : ''),
+      shortName: item.name,
+      category: item.admin1 ? `${item.admin1}, ${item.country || 'India'}` : 'Searched Region',
+      coordinates: [item.latitude, item.longitude],
+      lat: item.latitude,
+      lng: item.longitude,
+      elevation: item.elevation ? `${item.elevation}m MSL` : '380m MSL',
+      isCustom: true
+    }));
+  } catch (err) {
+    console.warn('Geocoding search failed:', err);
+    return [];
+  }
+}
+

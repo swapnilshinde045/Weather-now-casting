@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useSimulation } from '../context/SimulationContext';
-import { DEMO_LOCATIONS } from '../data/demoLocations';
-import { WEATHER_DATA_BY_SCENARIO } from '../data/demoWeatherData';
-import { MapPin, AlertTriangle, Clock, Zap, Layers, Satellite, ShieldCheck, Radio, ArrowUpRight, Compass } from 'lucide-react';
+import { searchCityGeocoding } from '../services/weatherApi';
+import { MapPin, AlertTriangle, Clock, Zap, Layers, Satellite, Search, Loader2, RefreshCw, X } from 'lucide-react';
 
 const MapRecenter = ({ center }) => {
   const map = useMap();
@@ -49,19 +48,60 @@ export const HyperLocalMap = () => {
   const { 
     selectedLocationId, 
     setSelectedLocationId, 
+    locationsList,
+    addAndSelectCity,
+    currentLocation,
+    currentWeather,
     scenario, 
     language 
   } = useSimulation();
 
   const [activeLayer, setActiveLayer] = useState('osm');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
-  const selectedLoc = DEMO_LOCATIONS.find(l => l.id === selectedLocationId) || DEMO_LOCATIONS[0];
-  const selectedWeatherData = WEATHER_DATA_BY_SCENARIO[scenario][selectedLocationId] || WEATHER_DATA_BY_SCENARIO[scenario].waluj;
+  const selectedLoc = locationsList.find(l => l.id === selectedLocationId) || locationsList[0];
+  const selectedWeatherData = currentWeather;
 
   const tileUrls = {
     osm: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    carto: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    topo: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
+    carto: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+  };
+
+  // Debounced City Search
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      const results = await searchCityGeocoding(searchQuery);
+      setSearchResults(results);
+      setIsSearching(false);
+      setShowDropdown(true);
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const handleSelectSearchResult = async (item) => {
+    setShowDropdown(false);
+    setSearchQuery('');
+    await addAndSelectCity(item);
+  };
+
+  const handleQuickSearch = async (cityName) => {
+    setIsSearching(true);
+    const results = await searchCityGeocoding(cityName);
+    if (results && results.length > 0) {
+      await addAndSelectCity(results[0]);
+    }
+    setIsSearching(false);
   };
 
   return (
@@ -75,20 +115,96 @@ export const HyperLocalMap = () => {
         </div>
 
         <h2 className="text-2xl sm:text-4xl font-black text-stone-900 tracking-tight">
-          Hyper-Local Geospatial Risk & Radar Map
+          Hyper-Local Geospatial Risk & City Radar Map
         </h2>
 
         <p className="text-xs sm:text-sm text-stone-600 font-medium leading-relaxed">
-          Interactive GIS spatial grid across 5 Chhatrapati Sambhajinagar sectors. Multi-layer telemetry combining INSAT-3DR multispectral cloud top imagery, CartoDEM 30m digital elevation grid, and Gemini AI risk contours.
+          Search ANY city or district across India for live satellite & weather telemetry. Fuses Open-Meteo geocoding, INSAT-3DR satellite infrared cloud imagery, and Gemini AI zero-shot risk nowcasts.
         </p>
       </div>
 
-      {/* Sector Quick Switcher Tabs */}
+      {/* SEARCH BOX FOR CITY & DISTRICT */}
+      <div className="bg-stone-50 p-4 rounded-2xl border-2 border-stone-300 space-y-3 shadow-2xs relative">
+        <div className="flex items-center justify-between gap-3">
+          <div className="relative flex-1">
+            <div className="relative flex items-center">
+              <Search className="w-4 h-4 text-stone-400 absolute left-3.5 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchQuery.length >= 2 && setShowDropdown(true)}
+                placeholder="🔍 Type city or district name (e.g., Mumbai, Pune, Delhi, Nashik, Bengaluru)..."
+                className="w-full pl-10 pr-10 py-2.5 bg-white border-2 border-amber-800/40 focus:border-amber-800 rounded-xl text-stone-900 font-semibold text-xs shadow-2xs focus:outline-none transition"
+              />
+              {isSearching ? (
+                <Loader2 className="w-4 h-4 text-amber-800 animate-spin absolute right-3" />
+              ) : searchQuery ? (
+                <button onClick={() => setSearchQuery('')} className="absolute right-3 text-stone-400 hover:text-stone-700">
+                  <X className="w-4 h-4" />
+                </button>
+              ) : null}
+            </div>
+
+            {/* Search Suggestion Dropdown */}
+            {showDropdown && searchResults.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-amber-800/60 rounded-xl shadow-2xl z-[500] max-h-60 overflow-y-auto divide-y divide-stone-100 font-mono text-xs">
+                {searchResults.map((res) => (
+                  <button
+                    key={res.id}
+                    onClick={() => handleSelectSearchResult(res)}
+                    className="w-full text-left p-3 hover:bg-amber-50/80 transition flex items-center justify-between cursor-pointer"
+                  >
+                    <div>
+                      <div className="font-bold text-stone-900">{res.shortName}</div>
+                      <div className="text-[10px] text-stone-500">{res.category}</div>
+                    </div>
+                    <div className="text-[10px] font-mono text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded border border-amber-300">
+                      {res.coordinates[0].toFixed(2)}°N, {res.coordinates[1].toFixed(2)}°E
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="hidden sm:flex items-center space-x-1 bg-white p-1 rounded-xl border border-stone-300 text-[11px] font-mono font-bold">
+            <button
+              onClick={() => setActiveLayer('osm')}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${activeLayer === 'osm' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'text-stone-600 hover:text-stone-900'}`}
+            >
+              OpenStreetMap
+            </button>
+            <button
+              onClick={() => setActiveLayer('carto')}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${activeLayer === 'carto' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'text-stone-600 hover:text-stone-900'}`}
+            >
+              Carto Voyager
+            </button>
+          </div>
+        </div>
+
+        {/* Quick Search City Chips */}
+        <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar font-mono text-xs pt-1">
+          <span className="text-stone-400 font-bold text-[10px] uppercase">POPULAR SEARCHES:</span>
+          {['Mumbai', 'Pune', 'Nashik', 'Delhi', 'Bengaluru', 'Nagpur', 'Latur'].map((city) => (
+            <button
+              key={city}
+              onClick={() => handleQuickSearch(city)}
+              className="px-2.5 py-1 rounded-lg bg-white hover:bg-amber-100 text-stone-800 border border-stone-200 text-[11px] font-semibold transition cursor-pointer shadow-2xs whitespace-nowrap"
+            >
+              📍 {city}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Sector Quick Switcher Bar */}
       <div className="flex items-center justify-between flex-wrap gap-2 bg-stone-50 p-2 rounded-2xl border border-stone-200 font-mono text-xs">
         <div className="flex items-center space-x-1.5 overflow-x-auto max-w-full py-1">
-          <span className="text-stone-400 font-bold px-2 text-[10px] hidden sm:inline">SECTORS:</span>
-          {DEMO_LOCATIONS.map((loc) => {
-            const locWeather = WEATHER_DATA_BY_SCENARIO[scenario][loc.id] || WEATHER_DATA_BY_SCENARIO[scenario].waluj;
+          <span className="text-stone-400 font-bold px-2 text-[10px] hidden sm:inline">ACTIVE LOCATIONS:</span>
+          {locationsList.map((loc) => {
+            const locWeather = loc.id === selectedLocationId ? currentWeather : (WEATHER_DATA_BY_SCENARIO[scenario][loc.id] || WEATHER_DATA_BY_SCENARIO[scenario].waluj);
             const isSelected = loc.id === selectedLocationId;
             const colorHex = getRiskColor(locWeather.riskLevel);
 
@@ -108,22 +224,6 @@ export const HyperLocalMap = () => {
             );
           })}
         </div>
-
-        {/* Map Tile Layer Selector */}
-        <div className="flex items-center space-x-1 bg-white p-1 rounded-xl border border-stone-200 text-[11px]">
-          <button
-            onClick={() => setActiveLayer('osm')}
-            className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer ${activeLayer === 'osm' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'text-stone-600 hover:text-stone-900'}`}
-          >
-            OpenStreetMap
-          </button>
-          <button
-            onClick={() => setActiveLayer('carto')}
-            className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer ${activeLayer === 'carto' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'text-stone-600 hover:text-stone-900'}`}
-          >
-            Carto Voyager
-          </button>
-        </div>
       </div>
 
       {/* Main Section Level Map Container & Sector Panel Grid */}
@@ -136,10 +236,10 @@ export const HyperLocalMap = () => {
           <div className="absolute top-3 left-3 z-[400] bg-stone-950/90 text-white p-2.5 rounded-xl border border-stone-800 backdrop-blur-md shadow-lg font-mono text-[11px] space-y-1">
             <div className="flex items-center space-x-2 font-bold text-amber-400">
               <Satellite className="w-3.5 h-3.5 text-sky-400 animate-pulse" />
-              <span>INSAT-3DR Stream Active</span>
+              <span>INSAT-3DR Satellite Stream Active</span>
             </div>
-            <div className="text-[10px] text-stone-400">
-              Selected Sector: <strong className="text-white">{selectedLoc.name}</strong>
+            <div className="text-[10px] text-stone-300">
+              Active Monitored City: <strong className="text-white">{selectedLoc.name}</strong>
             </div>
           </div>
 
@@ -156,8 +256,8 @@ export const HyperLocalMap = () => {
               url={tileUrls[activeLayer]}
             />
 
-            {DEMO_LOCATIONS.map((loc) => {
-              const locWeather = WEATHER_DATA_BY_SCENARIO[scenario][loc.id] || WEATHER_DATA_BY_SCENARIO[scenario].waluj;
+            {locationsList.map((loc) => {
+              const locWeather = loc.id === selectedLocationId ? currentWeather : (WEATHER_DATA_BY_SCENARIO[scenario][loc.id] || WEATHER_DATA_BY_SCENARIO[scenario].waluj);
               const isSelected = loc.id === selectedLocationId;
               const colorHex = getRiskColor(locWeather.riskLevel);
 
@@ -166,7 +266,7 @@ export const HyperLocalMap = () => {
                   {/* Convective Risk Polygon Circle */}
                   <Circle
                     center={loc.coordinates}
-                    radius={loc.id === 'waluj' ? 3400 : 2400}
+                    radius={3000}
                     pathOptions={{
                       color: colorHex,
                       fillColor: colorHex,
@@ -206,14 +306,14 @@ export const HyperLocalMap = () => {
             <div className="border-b border-stone-200 pb-3 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-mono text-stone-400 font-bold uppercase tracking-wider block">
-                  SELECTED SECTOR TELEMETRY
+                  SEARCHED CITY TELEMETRY
                 </span>
                 <h3 className="text-lg font-black text-stone-900 mt-0.5">
                   {selectedLoc.name}
                 </h3>
               </div>
               <span className="px-2.5 py-1 rounded-lg bg-white border border-stone-300 font-mono font-bold text-[11px] text-stone-800 shadow-2xs">
-                ID: {selectedLoc.id.toUpperCase()}
+                {selectedLoc.coordinates[0].toFixed(2)}°N
               </span>
             </div>
 
@@ -233,6 +333,11 @@ export const HyperLocalMap = () => {
               <div className="flex justify-between p-2 rounded-lg bg-white border border-stone-200">
                 <span className="text-stone-500">Gemini Confidence:</span>
                 <span className="font-bold text-emerald-800">{selectedWeatherData.predictionConfidence}</span>
+              </div>
+
+              <div className="flex justify-between p-2 rounded-lg bg-white border border-stone-200">
+                <span className="text-stone-500">Live Temperature:</span>
+                <span className="font-bold text-stone-900">{selectedWeatherData.temp} °C</span>
               </div>
 
               <div className="flex justify-between p-2 rounded-lg bg-white border border-stone-200">
@@ -262,7 +367,7 @@ export const HyperLocalMap = () => {
               className="w-full py-3 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2 cursor-pointer"
             >
               <Zap className="w-4 h-4 text-amber-400" />
-              <span>Dispatch Sector CAP v1.2 Warning</span>
+              <span>Dispatch CAP v1.2 Warning for {selectedLoc.shortName}</span>
             </button>
           </div>
 

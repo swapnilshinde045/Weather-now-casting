@@ -7,6 +7,7 @@ export const LiveDashboard = () => {
   const { 
     selectedLocationId, 
     setSelectedLocationId, 
+    locationsList,
     currentLocation, 
     currentWeather 
   } = useSimulation();
@@ -32,10 +33,10 @@ export const LiveDashboard = () => {
 
       {/* Sector Selection Bar */}
       <div className="flex items-center justify-between flex-wrap gap-2 bg-stone-50 p-2.5 rounded-2xl border border-stone-200">
-        <span className="text-xs font-mono font-bold text-stone-500 uppercase px-2">SELECT MONITORING SECTOR:</span>
+        <span className="text-xs font-mono font-bold text-stone-500 uppercase px-2">ACTIVE MONITORED SECTORS:</span>
         
         <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-1">
-          {DEMO_LOCATIONS.map((loc) => (
+          {locationsList.map((loc) => (
             <button
               key={loc.id}
               onClick={() => setSelectedLocationId(loc.id)}
