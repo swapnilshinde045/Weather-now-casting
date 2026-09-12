@@ -116,7 +116,7 @@ export const PresentationModeView = () => {
   const activeSlideObj = slides[currentSlide];
 
   return (
-    <div className="min-h-screen bg-[#faf7f2] text-stone-900 flex flex-col justify-between p-4 sm:p-6 font-sans relative selection:bg-amber-200">
+    <div className="min-h-screen bg-grid-pattern text-stone-900 flex flex-col justify-between p-4 sm:p-6 font-sans relative selection:bg-amber-200">
       
       {/* Top Header Bar */}
       <div className="bg-white border border-stone-200 rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs sticky top-4 z-40">

@@ -27,7 +27,7 @@ const DashboardMain = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#faf7f2] text-stone-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-grid-pattern text-stone-900 flex flex-col font-sans">
       
       {/* Header */}
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
