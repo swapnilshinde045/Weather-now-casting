@@ -130,11 +130,49 @@ export const SimulationProvider = ({ children }) => {
   }, [isAutoPlaying]);
 
   // Derived current values
-  const currentScenarioMeta = SCENARIO_METADATA[scenario];
-  const currentLocation = locationsList.find(l => l.id === selectedLocationId) || locationsList[0];
-  const currentWeather = customWeatherDataMap[selectedLocationId] || (WEATHER_DATA_BY_SCENARIO[scenario][selectedLocationId] || WEATHER_DATA_BY_SCENARIO[scenario].waluj);
-  const currentTimeline = NOWCASTING_TIMELINE_DATA[scenario];
-  const currentAiFactors = AI_RISK_FACTORS[scenario];
+  const currentScenarioMeta = SCENARIO_METADATA[scenario] || SCENARIO_METADATA.NORMAL;
+  const currentLocation = (locationsList && locationsList.find(l => l.id === selectedLocationId)) || locationsList[0] || DEMO_LOCATIONS[0];
+
+  const defaultWeatherData = {
+    temp: '31.2',
+    humidity: '48',
+    rainfall: '0.2',
+    windSpeed: '12',
+    windDirection: 'SW',
+    pressure: 1012,
+    riskLevel: 'SAFE',
+    riskScore: 18,
+    predictedRisk: 'SAFE',
+    predictionConfidence: '92% (SIMULATION)',
+    expectedTime: 'Stable (Next 6 hrs)',
+    currentRainfall: '0.2 mm/h',
+    currentWindSpeed: '12 km/h',
+    recommendedAction: {
+      en: 'Normal conditions. No weather hazards detected.',
+      mr: 'सामान्य परिस्थिती. हवामानाचा कोणताही धोका आढळलेला नाही.',
+      hi: 'सामान्य स्थिति। मौसम का कोई खतरा नहीं पाया गया।'
+    }
+  };
+
+  const scenarioWeatherObj = WEATHER_DATA_BY_SCENARIO[scenario] || WEATHER_DATA_BY_SCENARIO.NORMAL;
+  const scenarioLocationWeather = scenarioWeatherObj[selectedLocationId] || scenarioWeatherObj.waluj || defaultWeatherData;
+
+  const currentWeather = {
+    ...defaultWeatherData,
+    ...scenarioLocationWeather,
+    ...(customWeatherDataMap[selectedLocationId] || {})
+  };
+
+  // Ensure currentRainfall & currentWindSpeed are populated
+  if (!currentWeather.currentRainfall) {
+    currentWeather.currentRainfall = `${currentWeather.rainfall} mm/h`;
+  }
+  if (!currentWeather.currentWindSpeed) {
+    currentWeather.currentWindSpeed = `${currentWeather.windSpeed} km/h`;
+  }
+
+  const currentTimeline = NOWCASTING_TIMELINE_DATA[scenario] || NOWCASTING_TIMELINE_DATA.NORMAL;
+  const currentAiFactors = AI_RISK_FACTORS[scenario] || AI_RISK_FACTORS.NORMAL;
   const t = MULTILINGUAL_TEXT[language] || MULTILINGUAL_TEXT.en;
 
   const value = {
