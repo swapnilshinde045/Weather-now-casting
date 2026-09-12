@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useSimulation } from '../context/SimulationContext';
+import { WEATHER_DATA_BY_SCENARIO } from '../data/demoWeatherData';
 import { searchCityGeocoding } from '../services/weatherApi';
 import { MapPin, AlertTriangle, Clock, Zap, Layers, Satellite, Search, Loader2, RefreshCw, X } from 'lucide-react';
 
@@ -49,6 +50,7 @@ export const HyperLocalMap = () => {
     selectedLocationId, 
     setSelectedLocationId, 
     locationsList,
+    customWeatherDataMap = {},
     addAndSelectCity,
     currentLocation,
     currentWeather,
